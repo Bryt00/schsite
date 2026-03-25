@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<!-- Header Start -->
+<div class="container-fluid bg-primary py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Help Our School</h1>
+                <p class="text-white">Your contribution makes a difference in our students' lives.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<!-- Causes Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Support NJUASCO</h6>
+            <h1 class="mb-5">Our Development Projects</h1>
+        </div>
+        <div class="row g-4">
+            {% for cause in causes %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="{{ forloop.counter|mul:0.1 }}s">
+                <div class="course-item h-100 d-flex flex-column">
+                    <div class="position-relative overflow-hidden">
+                        {% if cause.image %}
+                        <img alt="{{ cause.title }}" class="img-fluid w-100" src="{{ cause.image.url }}"
+                            style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <img alt="Cause" class="img-fluid w-100" src="{% static 'img/about.JPG' %}"
+                            style="height: 250px; object-fit: cover;">
+                        {% endif %}
+                        <div
+                            class="course-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <a class="btn btn-primary" href="{% url 'initiate_donation_with_cause' cause.id %}">Donate
+                                Now</a>
+                        </div>
+                    </div>
+                    <div class="p-4 flex-grow-1 text-center">
+                        <h5 class="mb-3">{{ cause.title }}</h5>
+                        <p class="text-muted small mb-4">{{ cause.description|truncatewords:20 }}</p>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between mb-1 small">
+                                <span>Goal: <strong>GHS {{ cause.goal_amount }}</strong></span>
+                                <span class="text-primary">Raised: <strong>GHS {{ cause.total_raised }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-4 shadow-sm border border-light">
+                    <p class="lead mb-4">No active development causes at the moment. You can still support our general
+                        school welfare.</p>
+                    <a href="{% url 'initiate_donation' %}" class="btn btn-primary py-3 px-5 shadow-sm">Make General
+                        Donation</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Causes End -->
+{% endblock %}

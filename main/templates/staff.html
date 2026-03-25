@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<!-- Header Start -->
+<div class="container-fluid py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Our Staff</h1>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+
+<!-- Team Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Our Educators</h6>
+            <h1 class="mb-5">Expert School Staff</h1>
+        </div>
+        <div class="row g-4">
+            {% for staff in staffs %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="team-item text-center p-4">
+                    <div class="staff-avatar-container mx-auto mb-4">
+                        <div class="staff-icon-circle bg-primary-light">
+                            {% if staff.use_icon %}
+                            <i class="fa {{ staff.icon_class }} text-primary fa-3x"></i>
+                            {% elif staff.image %}
+                            <img src="{{ staff.image.url }}" class="img-fluid rounded-circle" alt="{{ staff.name }}"
+                                style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #fff;">
+                            {% else %}
+                            <i class="fa fa-user text-primary fa-3x"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="mb-1 fw-bold">{{ staff.name }}</h5>
+                        <div class="badge bg-secondary-light text-secondary px-3 py-2 rounded-pill small">
+                            {{ staff.designation }}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Team End -->
+
+{% endblock content %}

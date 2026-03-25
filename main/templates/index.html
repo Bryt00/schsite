@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}
+Educated
+{% endblock title %}
+{% block content %}
+<!-- Carousel Start -->
+<div class="container-fluid p-0 mb-5">
+    <div class="owl-carousel header-carousel position-relative">
+        <div class="owl-carousel-item position-relative">
+            <img alt="Excellence" class="img-fluid" src="{% static 'img/carousel1.JPG' %}">
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center carousel-overlay">
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-sm-10 col-lg-8">
+                            <h5 class="text-secondary text-uppercase fw-bold mb-3 animated slideInDown">Shaping Future
+                                Leaders</h5>
+                            <h1 class="display-2 text-white fw-extra-bold animated slideInDown mb-4">Building Academic
+                                Excellence for Tomorrow</h1>
+                            <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">We provide a structured and
+                                disciplined environment where our students are empowered by expert mentorship to achieve
+                                superior results.</p>
+                            <div class="d-flex align-items-center animated slideInDown">
+                                <a href="{% url 'about' %}" class="btn btn-primary py-3 px-5 me-3">Learn More</a>
+                                <a href="{% url 'courses' %}" class="btn btn-outline-light py-3 px-5">Our Courses</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="owl-carousel-item position-relative">
+            <img alt="Success" class="img-fluid" src="{% static 'img/carousel2.JPG' %}">
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center carousel-overlay">
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-sm-10 col-lg-8">
+                            <h5 class="text-secondary text-uppercase fw-bold mb-3 animated slideInDown">Proven Pathway
+                                to Success</h5>
+                            <h1 class="display-2 text-white fw-extra-bold animated slideInDown mb-4">Your Foundation for
+                                Achievement</h1>
+                            <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">Deliver rigorous instruction,
+                                focused resources, and the support needed to unlock every student's full academic
+                                potential.</p>
+                            <div class="d-flex align-items-center animated slideInDown">
+                                <a href="{% url 'contact' %}" class="btn btn-primary py-3 px-5 me-3">Join Us</a>
+                                <a href="{% url 'cause_list' %}" class="btn btn-outline-light py-3 px-5">Support Us</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Carousel End -->
+
+
+{% include 'services.html' %}
+
+
+<!-- About Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="position-relative overflow-hidden rounded-4 shadow-lg">
+                    <img alt="About NJUASCO" class="img-fluid w-100" src="{{ about.image.url }}"
+                        style="object-fit: cover; min-height: 450px;">
+                    <div
+                        class="position-absolute bottom-0 start-0 w-100 p-4 bg-primary bg-opacity-75 backdrop-blur text-white">
+                        <h5 class="m-0">Empowering Students Since 2025</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                <h6 class="section-title text-start mb-3">About Us</h6>
+                <h1 class="mb-4">{{ about.title }}</h1>
+                <p class="lead mb-4">{{ about.subtitle }}</p>
+
+                <div class="row g-4 mb-5">
+                    {% if about.vision %}
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0 btn-square bg-primary rounded-circle">
+                                <i class="fa fa-eye text-white"></i>
+                            </div>
+                            <h5 class="ms-3 mb-0">Our Vision</h5>
+                        </div>
+                        <div class="text-muted small">
+                            {{ about.vision|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if about.mission %}
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0 btn-square bg-secondary rounded-circle">
+                                <i class="fa fa-bullseye text-white"></i>
+                            </div>
+                            <h5 class="ms-3 mb-0">Our Mission</h5>
+                        </div>
+                        <div class="text-muted small">
+                            {{ about.mission|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex pt-2">
+                    <a class="btn btn-primary py-3 px-5 me-3" href="{% url 'about' %}">Discover More</a>
+                    <a class="btn btn-outline-primary py-3 px-5" href="{% url 'contact' %}">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->
+
+
+<!-- Categories Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Curriculum</h6>
+            <h1 class="mb-5">Academic Categories</h1>
+        </div>
+        <div class="row g-4">
+            {% for category in course_categories %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ forloop.counter|add:1|mul:0.1 }}s">
+                <div class="category-item position-relative overflow-hidden rounded-4 shadow-sm h-100">
+                    <img alt="{{ category.name }}" class="img-fluid w-100 h-100" src="{{ category.image.url }}"
+                        style="object-fit: cover; min-height: 250px;">
+                    <div
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 opacity-0 category-hover">
+                        <h4 class="text-white m-0">{{ category.name }}</h4>
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-white text-center">
+                        <h5 class="m-0 text-dark">{{ category.name }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Categories End -->
+
+
+<!-- Gallery Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Our Legacy</h6>
+            <h1 class="mb-5">School Gallery</h1>
+        </div>
+        <div class="row g-4">
+            {% for gallery in galleries %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="{{ forloop.counter|mul:0.1 }}s">
+                <div class="gallery-item position-relative overflow-hidden rounded-4 shadow-sm h-100">
+                    <img alt="{{ gallery.name }}" class="img-fluid w-100 h-100" src="{{ gallery.image.url }}"
+                        style="object-fit: cover; min-height: 300px;">
+                    <div
+                        class="gallery-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 opacity-0 transition">
+                        <h4 class="text-white text-center m-0 p-3">{{ gallery.name }}</h4>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Gallery End -->
+
+
+<!-- Courses Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Academic Excellence</h6>
+            <h1 class="mb-5">Our Popular Courses</h1>
+        </div>
+        <div class="row g-4">
+            {% for course in courses %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="course-item h-100">
+                    <div class="position-relative overflow-hidden">
+                        <img alt="{{ course.name }}" class="img-fluid w-100" src="{{ course.image.url }}">
+                        <div
+                            class="course-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <a class="btn btn-primary" href="">Explore Syllabus</a>
+                        </div>
+                    </div>
+                    <div class="p-4 text-center">
+                        <h5 class="mb-0">{{ course.name }}</h5>
+                        <hr class="mx-auto w-25">
+                        <p class="text-muted small mb-0">High-intensity academic training focusing on core and elective
+                            subjects.</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Courses End -->
+
+
+<!-- Team Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Our Educators</h6>
+            <h1 class="mb-5">Expert School Staff</h1>
+        </div>
+        <div class="row g-4">
+            {% for staff in staffs %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="team-item text-center p-4">
+                    <div class="staff-avatar-container mx-auto mb-4">
+                        <div class="staff-icon-circle bg-primary-light">
+                            {% if staff.use_icon %}
+                            <i class="fa {{ staff.icon_class }} text-primary fa-3x"></i>
+                            {% elif staff.image %}
+                            <img src="{{ staff.image.url }}" class="img-fluid rounded-circle" alt="{{ staff.name }}"
+                                style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #fff;">
+                            {% else %}
+                            <i class="fa fa-user text-primary fa-3x"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="mb-1 fw-bold">{{ staff.name }}</h5>
+                        <div class="badge bg-secondary-light text-secondary px-3 py-2 rounded-pill small">
+                            {{ staff.designation }}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Team End -->
+
+
+{% endblock content %}

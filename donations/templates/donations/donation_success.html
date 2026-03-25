@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="p-5 bg-white rounded-4 shadow-sm border border-light">
+                    <div class="btn-square bg-success-light rounded-circle mx-auto mb-4"
+                        style="width: 100px; height: 100px;">
+                        <i class="fa fa-check fa-3x text-success"></i>
+                    </div>
+                    <h1 class="mb-4 text-dark">Thank You, {{ donation.donor_name }}!</h1>
+                    <p class="lead mb-4">Your generous contribution of <span class="text-success fw-bold">GHS {{ donation.amount }}</span> has been received successfully.</p>
+                    <div class="p-3 bg-light rounded-3 mb-4 small">
+                        <span class="text-muted">Transaction Reference:</span> <code
+                            class="text-dark">{{ donation.reference }}</code>
+                    </div>
+                    <hr class="my-4">
+                    <p class="text-muted mb-4 small">An email confirmation has been sent to {{ donation.donor_email }}.
+                        Thank you for supporting NJUASCO's development.</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'index' %}" class="btn btn-primary py-3 px-4 shadow-sm hover-up">Return Home</a>
+                        <a href="{% url 'cause_list' %}" class="btn btn-outline-primary py-3 px-4">View Other
+                            Projects</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="p-5 bg-white rounded-4 shadow-sm border border-light">
+                    <div class="btn-square bg-primary-light rounded-circle mx-auto mb-4"
+                        style="width: 80px; height: 80px;">
+                        <i class="fa fa-wallet fa-2x text-primary"></i>
+                    </div>
+                    <h1 class="mb-4">Finalize Donation</h1>
+                    <p class="mb-4 lead">You are about to donate <span class="text-primary fw-bold">GHS {{ donation.amount }}</span> to <span class="text-dark fw-bold">{% if donation.cause %}{{ donation.cause.title }}{% else %}the School{% endif %}</span>.</p>
+                    <button class="btn btn-primary btn-lg py-3 px-5 shadow-sm hover-up w-100"
+                        onclick="payWithPaystack()">
+                        <i class="fa fa-lock me-2"></i>Secure Pay with Paystack
+                    </button>
+                    <p class="mt-4 small text-muted"><i class="fa fa-shield-alt me-1"></i> Your transaction is encrypted
+                        and secure.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    function payWithPaystack() {
+        const amount = parseFloat("{{ donation.amount }}") * 100;
+        const handler = PaystackPop.setup({
+            key: '{{ paystack_public_key }}',
+            email: '{{ donation.donor_email }}',
+            amount: amount,
+            currency: 'GHS',
+            ref: '{{ donation.reference }}',
+            callback: function (response) {
+                window.location.href = "{% url 'verify_donation' donation.reference %}";
+            },
+            onClose: function () {
+                alert('Donation cancelled.');
+            }
+        });
+        handler.openIframe();
+    }
+</script>
+{% endblock %}

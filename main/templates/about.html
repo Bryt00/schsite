@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Header Start -->
+<div class="container-fluid py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">About Us</h1>
+                <p class="text-white-50 fs-4 animated slideInDown">"DAASEBRE MMA"</p>
+                <!--                    <nav aria-label="breadcrumb">-->
+                <!--                        <ol class="breadcrumb justify-content-center">-->
+                <!--                            <li class="breadcrumb-item"><a class="text-white" href="#">Home</a></li>-->
+                <!--                            <li class="breadcrumb-item"><a class="text-white" href="#">Pages</a></li>-->
+                <!--                            <li class="breadcrumb-item text-white active" aria-current="page">About</li>-->
+                <!--                        </ol>-->
+                <!--                    </nav>-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+{% include 'services.html' %}
+
+
+<!-- About Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="position-relative overflow-hidden rounded-4 shadow-lg">
+                    <img alt="About NJUASCO" class="img-fluid w-100" src="{{ about.image.url }}"
+                        style="object-fit: cover; min-height: 450px;">
+                </div>
+            </div>
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                <h6 class="section-title text-start mb-3">About Us</h6>
+                <h1 class="mb-2">{{ about.title }}</h1>
+                <h5 class="text-primary mb-4 italic">"DAASEBRE MMA"</h5>
+                <p class="lead mb-4">{{ about.subtitle }}</p>
+
+                <div class="row g-4 mt-2">
+                    <!-- Our Vision -->
+                    <div class="col-md-12">
+                        <div
+                            class="p-4 bg-white rounded-4 shadow-sm border-start border-4 border-primary h-100 hvr-shadow">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0 btn-square bg-primary-light rounded-circle">
+                                    <i class="fa fa-eye text-primary"></i>
+                                </div>
+                                <h4 class="ms-3 mb-0 text-primary">Our Vision</h4>
+                            </div>
+                            <p class="m-0 text-dark">To be a premier center of academic excellence and character
+                                development, producing innovative and disciplined leaders who positively impact the
+                                global community through integrity and service.</p>
+                        </div>
+                    </div>
+                    <!-- Our Mission -->
+                    <div class="col-md-12">
+                        <div
+                            class="p-4 bg-white rounded-4 shadow-sm border-start border-4 border-secondary h-100 hvr-shadow">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0 btn-square bg-secondary-light rounded-circle">
+                                    <i class="fa fa-bullseye text-secondary"></i>
+                                </div>
+                                <h4 class="ms-3 mb-0 text-secondary">Our Mission</h4>
+                            </div>
+                            <p class="m-0 text-dark">To provide a high-quality, holistic education through a structured
+                                and disciplined environment, empowered by expert mentorship to unlock every student's
+                                full potential and shape their future success.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-5 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="col-12">
+                <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                    <p class="m-0 lead text-dark">{{ about.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->
+
+
+<!-- Team Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title text-center mb-3">Our Educators</h6>
+            <h1 class="mb-5">Expert School Staff</h1>
+        </div>
+        <div class="row g-4">
+            {% for staff in staffs %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="team-item text-center p-4">
+                    <div class="staff-avatar-container mx-auto mb-4">
+                        <div class="staff-icon-circle bg-primary-light">
+                            {% if staff.use_icon %}
+                            <i class="fa {{ staff.icon_class }} text-primary fa-3x"></i>
+                            {% elif staff.image %}
+                            <img src="{{ staff.image.url }}" class="img-fluid rounded-circle" alt="{{ staff.name }}"
+                                style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #fff;">
+                            {% else %}
+                            <i class="fa fa-user text-primary fa-3x"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="mb-1 fw-bold">{{ staff.name }}</h5>
+                        <div class="badge bg-secondary-light text-secondary px-3 py-2 rounded-pill small">
+                            {{ staff.designation }}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Team End -->
+
+{% endblock content %}
