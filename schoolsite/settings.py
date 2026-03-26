@@ -43,7 +43,10 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost", "njuascogh.org", "www.njuascogh.org"]
 # Application definition
 
 INSTALLED_APPS = [
-
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+    'unfold.contrib.inlines',
 
     'tinymce',
     'main',
@@ -58,7 +61,54 @@ INSTALLED_APPS = [
 
 ]
 
-
+UNFOLD = {
+    "SITE_TITLE": "New Juaben Schools Admin",
+    "SITE_HEADER": "NJASC Admin",
+    "SITE_SYMBOL": "school",  # icon identifier from Heroicons
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        "primary": {
+            "50": "243 232 255",
+            "100": "233 213 255",
+            "200": "216 180 254",
+            "300": "192 132 252",
+            "400": "168 85 247",
+            "500": "147 51 234",
+            "600": "126 34 206",
+            "700": "107 33 168",
+            "800": "88 28 135",
+            "900": "78 28 118",
+            "950": "54 13 89",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "School Management",
+                "items": [
+                    {
+                        "title": "About NJUASCO",
+                        "link": "/admin/main/about/",
+                        "icon": "info",
+                    },
+                    {
+                        "title": "Academic Programmes",
+                        "link": "/admin/main/programme/",
+                        "icon": "school",
+                    },
+                    {
+                        "title": "School Staff",
+                        "link": "/admin/main/staff/",
+                        "icon": "people",
+                    },
+                ],
+            },
+        ],
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -175,4 +225,3 @@ PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
- 

@@ -3,3 +3,4 @@ django-tinymce
 psycopg2-binary
 Pillow
 django-environ
+django-unfold

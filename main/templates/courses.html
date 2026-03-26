@@ -24,25 +24,25 @@
 <!-- Header End -->
 
 
-<!-- Categories Start -->
+<!-- Programmes Start -->
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="section-title text-center mb-3">Curriculum</h6>
-            <h1 class="mb-5">Academic Categories</h1>
+            <h1 class="mb-5">Programmes</h1>
         </div>
         <div class="row g-4">
-            {% for category in course_categories %}
+            {% for programme in programmes %}
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ forloop.counter|add:1|mul:0.1 }}s">
                 <div class="category-item position-relative overflow-hidden rounded-4 shadow-sm h-100">
-                    <img alt="{{ category.name }}" class="img-fluid w-100 h-100" src="{{ category.image.url }}"
+                    <img alt="{{ programme.name }}" class="img-fluid w-100 h-100" src="{{ programme.image.url }}"
                         style="object-fit: cover; min-height: 250px;">
                     <div
                         class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 opacity-0 category-hover">
-                        <h4 class="text-white m-0">{{ category.name }}</h4>
+                        <h4 class="text-white m-0">{{ programme.name }}</h4>
                     </div>
                     <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-white text-center">
-                        <h5 class="m-0 text-dark">{{ category.name }}</h5>
+                        <h5 class="m-0 text-dark">{{ programme.name }}</h5>
                     </div>
                 </div>
             </div>
@@ -50,29 +50,40 @@
         </div>
     </div>
 </div>
-<!-- Categories End -->
+<!-- Programmes End -->
 
 
-<!-- Courses Start -->
+<!-- Subjects Start -->
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="section-title text-center mb-3">Academic Excellence</h6>
-            <h1 class="mb-5">Our Popular Courses</h1>
+            <h1 class="mb-5">Subjects & Learning Areas</h1>
         </div>
         <div class="row g-4">
-            {% for course in courses %}
+            {% for subject in subjects %}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="course-item h-100">
                     <div class="position-relative overflow-hidden">
-                        <img alt="{{ course.name }}" class="img-fluid w-100" src="{{ course.image.url }}">
+                        <img alt="{{ subject.name }}" class="img-fluid w-100" src="{{ subject.image.url }}">
                         <div
                             class="course-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                            <a class="btn btn-primary" href="">Explore Syllabus</a>
+                            {% if subject.syllabus_url %}
+                            <a class="btn btn-primary" href="{{ subject.syllabus_url }}" target="_blank">Explore Syllabus</a>
+                            {% else %}
+                            <span class="btn btn-primary disabled">Syllabus Coming Soon</span>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="p-4 text-center">
-                        <h5 class="mb-0">{{ course.name }}</h5>
+                        <h5 class="mb-0">
+                            {{ subject.name }}
+                            {% if subject.is_core %}
+                            <span class="badge bg-primary ms-2" style="font-size: 0.6rem; vertical-align: middle;">Core Subject</span>
+                            {% else %}
+                            <span class="badge bg-secondary ms-2" style="font-size: 0.6rem; vertical-align: middle;">Elective Subject</span>
+                            {% endif %}
+                        </h5>
                         <hr class="mx-auto w-25">
                         <p class="text-muted small mb-0">High-intensity academic training focusing on core and elective
                             subjects.</p>
@@ -83,6 +94,6 @@
         </div>
     </div>
 </div>
-<!-- Courses End -->
+<!-- Subjects End -->
 
 {% endblock content %}

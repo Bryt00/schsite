@@ -5,8 +5,8 @@
 set -e
 
 # Configuration
-PROJECT_NAME="foundationsite"
-PROJECT_DIR="/home/bryt/$PROJECT_NAME"
+PROJECT_NAME="schsite"
+PROJECT_DIR="/home/bryt/sites/$PROJECT_NAME"
 DOMAIN="njuascogh.org" # Replace with actual domain
 USER="bryt"           # Replace if using a different non-root user
 GUNICORN_WORKERS=3
@@ -86,7 +86,7 @@ User=$USER
 Group=www-data
 WorkingDirectory=$PROJECT_DIR
 Environment=\"PATH=$PROJECT_DIR/venv/bin\"
-ExecStart=$PROJECT_DIR/venv/bin/gunicorn --access-logfile - --workers $GUNICORN_WORKERS --bind unix:$PROJECT_DIR/$PROJECT_NAME.sock churchsite.wsgi:application
+ExecStart=$PROJECT_DIR/venv/bin/gunicorn --access-logfile - --workers $GUNICORN_WORKERS --bind unix:$PROJECT_DIR/$PROJECT_NAME.sock schoolsite.wsgi:application
 
 [Install]
 WantedBy=multi-user.target

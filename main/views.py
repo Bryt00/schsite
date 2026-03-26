@@ -1,22 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import About, CourseCategory, Course, Staff, Gallery, Event
+from .models import About, Programme, Subject, Staff, Gallery, Event
 from .forms import ContactForm
 
 
 def index(request):
     about_data = About.objects.all()[:1]
-    course_categories = CourseCategory.objects.all()[:4]
-    courses = Course.objects.all()[:3]
-    staffs = Staff.objects.all()[:4]
-    galleries = Gallery.objects.all()[:6]
+    programmes = Programme.objects.all()[:4]
+    subjects = Subject.objects.all()[:4]
+    staffs = Staff.objects.filter(is_leadership=True).order_by('sort_order', 'id')[:4]
+    galleries = Gallery.objects.all()[:4]
     about = None
     if len(about_data) > 0:
         about = about_data[0]
     context = {
         'about': about,
-        'course_categories': course_categories,
-        'courses': courses,
+        'programmes': programmes,
+        'subjects': subjects,
         'staffs': staffs,
         'galleries': galleries,
     }
@@ -35,11 +35,11 @@ def about(request):
     return render(request, 'about.html', context)
 
 def courses(request):
-    course_categories = CourseCategory.objects.all()[:4]
-    courses = Course.objects.all()
+    programmes = Programme.objects.all()[:4]
+    subjects = Subject.objects.all()
     context = {
-        "courses": courses,
-        "course_categories": course_categories,
+        "subjects": subjects,
+        "programmes": programmes,
     }
     return render(request, 'courses.html', context)
 
@@ -54,9 +54,14 @@ def gallery(request):
     return render(request, 'gallery.html', context)
 
 def staff(request):
-    staffs = Staff.objects.all()
+    leadership_staff = Staff.objects.filter(is_leadership=True).order_by('sort_order', 'id')
+    teaching_staff = Staff.objects.filter(staff_type='TEACHING').order_by('name')
+    non_teaching_staff = Staff.objects.filter(staff_type='NON_TEACHING').order_by('name')
+    
     context = {
-        "staffs": staffs,
+        "leadership_staff": leadership_staff,
+        "teaching_staff": teaching_staff,
+        "non_teaching_staff": non_teaching_staff,
     }
     return render(request, 'staff.html', context)
 
@@ -74,3 +79,12 @@ def event_details(request, id):
     }
     return render(request, "event_details.html", context)
 
+def staff_details(request, id):
+    staff = Staff.objects.get(pk=id)
+    # Get subjects taught if it's a teaching staff
+    subjects = staff.subjects_taught.all()
+    context = {
+        "staff": staff,
+        "subjects": subjects,
+    }
+    return render(request, "staff_details.html", context)

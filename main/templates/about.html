@@ -30,7 +30,7 @@
         <div class="row g-5 align-items-center">
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="position-relative overflow-hidden rounded-4 shadow-lg">
-                    <img alt="About NJUASCO" class="img-fluid w-100" src="{{ about.image.url }}"
+                    <img alt="About NJUASCO" class="img-fluid w-100" src="{% if about.image %}{{ about.image.url }}{% else %}{% static 'img/about_fallback.png' %}{% endif %}"
                         style="object-fit: cover; min-height: 450px;">
                 </div>
             </div>
@@ -38,7 +38,7 @@
                 <h6 class="section-title text-start mb-3">About Us</h6>
                 <h1 class="mb-2">{{ about.title }}</h1>
                 <h5 class="text-primary mb-4 italic">"DAASEBRE MMA"</h5>
-                <p class="lead mb-4">{{ about.subtitle }}</p>
+                <div class="lead mb-4">{{ about.subtitle|safe }}</div>
 
                 <div class="row g-4 mt-2">
                     <!-- Our Vision -->
@@ -51,9 +51,7 @@
                                 </div>
                                 <h4 class="ms-3 mb-0 text-primary">Our Vision</h4>
                             </div>
-                            <p class="m-0 text-dark">To be a premier center of academic excellence and character
-                                development, producing innovative and disciplined leaders who positively impact the
-                                global community through integrity and service.</p>
+                            <div class="m-0 text-dark">{{ about.vision|safe }}</div>
                         </div>
                     </div>
                     <!-- Our Mission -->
@@ -66,9 +64,7 @@
                                 </div>
                                 <h4 class="ms-3 mb-0 text-secondary">Our Mission</h4>
                             </div>
-                            <p class="m-0 text-dark">To provide a high-quality, holistic education through a structured
-                                and disciplined environment, empowered by expert mentorship to unlock every student's
-                                full potential and shape their future success.</p>
+                            <div class="m-0 text-dark">{{ about.mission|safe }}</div>
                         </div>
                     </div>
                 </div>
@@ -77,7 +73,7 @@
         <div class="row pt-5 wow fadeInUp" data-wow-delay="0.1s">
             <div class="col-12">
                 <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
-                    <p class="m-0 lead text-dark">{{ about.description }}</p>
+                    <div class="m-0 lead text-dark">{{ about.description|safe }}</div>
                 </div>
             </div>
         </div>
