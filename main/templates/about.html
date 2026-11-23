@@ -17,109 +17,98 @@
 </div>
 <!-- Header End -->
 
-<!-- Institutional Overview Start (No Stock Photo) -->
+<!-- Institutional Overview Start -->
 <div class="container-xxl py-5">
     <div class="container">
-        <div class="row g-5 align-items-stretch">
-            <!-- Left: Institutional Story & Overview -->
-            <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="about-overview-card bg-white rounded-4 shadow-sm p-4 p-lg-5 h-100 border border-light">
-                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-light text-primary fw-semi-bold small mb-3">
-                        <i class="fa fa-university"></i>
-                        <span>Who We Are</span>
-                    </div>
-                    <h1 class="mb-2">{{ about.title|default:"New Juaben Senior High Commercial School" }}</h1>
-                    <p class="text-primary fw-bold mb-4 fst-italic">"DAASEBRE MMA" — Excellence, Integrity &amp; Service</p>
+        <div class="row g-4 align-items-stretch">
+            <!-- Left: Who We Are -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="about-overview-card bg-white rounded-4 shadow-sm p-4 p-lg-5 h-100 border border-light d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-light text-primary fw-semi-bold small mb-3">
+                            <i class="fa fa-university"></i>
+                            <span>Who We Are</span>
+                        </div>
+                        <h2 class="mb-2">{{ about.title|default:"New Juaben Senior High Commercial School" }}</h2>
+                        <p class="text-primary fw-bold mb-3 fst-italic">"DAASEBRE MMA"</p>
 
-                    {% if about.subtitle %}
-                    <div class="lead text-dark mb-4">{{ about.subtitle|safe }}</div>
-                    {% else %}
-                    <p class="lead text-dark mb-4">
-                        New Juaben Senior High Commercial School (NJUASCO) is a premier second-cycle institution in Koforidua, committed to nurturing disciplined, innovative, and ethically grounded leaders.
-                    </p>
-                    {% endif %}
-
-                    <div class="text-muted about-description">
-                        {% if about.description %}
-                            {{ about.description|safe }}
-                        {% else %}
-                            <p class="mb-3">
-                                Rooted in a proud heritage of academic and commercial excellence, NJUASCO provides a structured, supportive, and intellectually rigorous environment where students discover their strengths and prepare for higher education and purposeful careers.
-                            </p>
-                            <p class="mb-0">
-                                Guided by dedicated educators and strong moral values, our students—proudly known as <strong>Daasebre Mma</strong>—consistently excel across the sciences, business, arts, vocational disciplines, and civic leadership.
-                            </p>
-                        {% endif %}
+                        <div class="text-muted mb-4">
+                            {% if about.subtitle %}
+                                <p class="lead text-dark mb-3">{{ about.subtitle|safe }}</p>
+                            {% else %}
+                                <p class="lead text-dark mb-3">
+                                    New Juaben Senior High Commercial School (NJUASCO) is a premier second-cycle institution in Koforidua dedicated to academic excellence, discipline, and moral integrity.
+                                </p>
+                            {% endif %}
+                            
+                            {% if about.description %}
+                                <div class="text-secondary small">{{ about.description|safe|truncatewords_html:60 }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div class="d-flex flex-wrap gap-3 mt-4 pt-3 border-top border-light">
+                    <div class="d-flex flex-wrap gap-3 pt-3 border-top border-light">
                         <a href="{% url 'courses' %}" class="btn btn-primary px-4 py-2">
                             <i class="fa fa-book-open me-2"></i>Explore Programmes
                         </a>
                         <a href="{% url 'staff' %}" class="btn btn-outline-primary px-4 py-2">
-                            <i class="fa fa-users me-2"></i>School Leadership
+                            <i class="fa fa-users me-2"></i>Our Staff
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Institutional Identity & Key Pillars Panel -->
-            <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.2s">
-                <div class="about-identity-panel rounded-4 shadow-lg p-4 p-lg-5 h-100 d-flex flex-column justify-content-between text-white">
+            <!-- Right: Clean Institutional Highlights Panel -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="bg-white rounded-4 shadow-sm p-4 p-lg-5 h-100 border border-light d-flex flex-column justify-content-between">
                     <div>
-                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-light border-opacity-10">
-                            <div class="about-crest-badge bg-white rounded-3 p-2 me-3 shadow-sm flex-shrink-0">
-                                <img src="{% static 'img/logo.png' %}" alt="NJUASCO Crest" width="54" height="54" style="object-fit: contain;">
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                            <div class="bg-light rounded-3 p-2 me-3 border flex-shrink-0">
+                                <img src="{% static 'img/logo.png' %}" alt="NJUASCO Crest" width="50" height="50" style="object-fit: contain;">
                             </div>
                             <div>
-                                <span class="text-uppercase small fw-bold text-secondary d-block">Institutional Identity</span>
-                                <h4 class="text-white mb-0">NJUASCO</h4>
-                                <small class="text-white-50">Motto: "Daasebre Mma"</small>
+                                <h4 class="mb-0 text-dark">NJUASCO</h4>
+                                <small class="text-muted"><i class="fa fa-map-marker-alt text-primary me-1"></i>Koforidua, Eastern Region</small>
                             </div>
                         </div>
 
-                        <p class="text-white-50 mb-4">
-                            Our educational philosophy balances rigorous classroom instruction with practical competence, moral discipline, and community responsibility.
-                        </p>
-
+                        <!-- 4 Clean Stats / Badges -->
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <div class="about-stat-tile p-3 rounded-3 h-100">
-                                    <div class="text-secondary mb-2"><i class="fa fa-graduation-cap fa-lg"></i></div>
-                                    <h6 class="text-white mb-1">5+ Programmes</h6>
-                                    <p class="text-white-50 small mb-0">Science, Business, General Arts, Visual Arts &amp; Home Economics</p>
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <i class="fa fa-graduation-cap text-primary mb-2 fa-lg"></i>
+                                    <h6 class="mb-1 text-dark">Programmes</h6>
+                                    <p class="text-muted small mb-0">Science, Business, Arts, Visual Arts &amp; Home Econs</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="about-stat-tile p-3 rounded-3 h-100">
-                                    <div class="text-secondary mb-2"><i class="fa fa-award fa-lg"></i></div>
-                                    <h6 class="text-white mb-1">Academic Rigor</h6>
-                                    <p class="text-white-50 small mb-0">Structured preparation for WASSCE &amp; tertiary success</p>
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <i class="fa fa-award text-primary mb-2 fa-lg"></i>
+                                    <h6 class="mb-1 text-dark">Excellence</h6>
+                                    <p class="text-muted small mb-0">Proven track record in academic &amp; practical training</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="about-stat-tile p-3 rounded-3 h-100">
-                                    <div class="text-secondary mb-2"><i class="fa fa-shield-alt fa-lg"></i></div>
-                                    <h6 class="text-white mb-1">Character First</h6>
-                                    <p class="text-white-50 small mb-0">Grounded in integrity, respect, and civic duty</p>
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <i class="fa fa-shield-alt text-primary mb-2 fa-lg"></i>
+                                    <h6 class="mb-1 text-dark">Values</h6>
+                                    <p class="text-muted small mb-0">Discipline, leadership, and integrity</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="about-stat-tile p-3 rounded-3 h-100">
-                                    <div class="text-secondary mb-2"><i class="fa fa-chalkboard-teacher fa-lg"></i></div>
-                                    <h6 class="text-white mb-1">Expert Mentors</h6>
-                                    <p class="text-white-50 small mb-0">Dedicated teaching and non-teaching professionals</p>
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <i class="fa fa-chalkboard-teacher text-primary mb-2 fa-lg"></i>
+                                    <h6 class="mb-1 text-dark">Faculty</h6>
+                                    <p class="text-muted small mb-0">Qualified and experienced teaching staff</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-top border-light border-opacity-10 d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <span class="small text-white-50">
-                            <i class="fa fa-map-marker-alt text-secondary me-2"></i>Koforidua, Eastern Region - Ghana
-                        </span>
-                        <a href="{% url 'contact' %}" class="text-secondary text-decoration-none small fw-bold">
-                            Contact Administration <i class="fa fa-arrow-right ms-1"></i>
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-4">
+                        <span class="text-muted small">GES Approved Institution</span>
+                        <a href="{% url 'contact' %}" class="text-primary text-decoration-none small fw-bold">
+                            Contact Us <i class="fa fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>

@@ -7,18 +7,18 @@
             <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="bg-white rounded-4 shadow-sm border border-light overflow-hidden">
                     <!-- Top Header Banner -->
-                    <div class="about-identity-panel p-4 p-lg-5 text-white">
+                    <div class="p-4 p-lg-5 border-bottom bg-light">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                             <div class="d-flex align-items-center">
-                                <div class="bg-white rounded-3 p-2 me-3 shadow-sm">
+                                <div class="bg-white rounded-3 p-2 me-3 shadow-sm border">
                                     <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="48" height="48" style="object-fit: contain;">
                                 </div>
                                 <div>
-                                    <span class="text-uppercase small fw-bold text-secondary d-block">Step 2 of 2 • Checkout</span>
-                                    <h3 class="text-white mb-0">Confirm &amp; Complete Payment</h3>
+                                    <span class="text-uppercase small fw-bold text-primary d-block">Step 2 of 2 • Checkout</span>
+                                    <h3 class="text-dark mb-0">Confirm &amp; Complete Payment</h3>
                                 </div>
                             </div>
-                            <span class="badge bg-secondary text-dark px-3 py-2 rounded-pill fw-bold">
+                            <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold">
                                 Ref: {{ payment.reference }}
                             </span>
                         </div>

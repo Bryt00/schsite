@@ -25,14 +25,14 @@
     <div class="container">
         {% if not fee_config %}
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="p-5 bg-white rounded-4 shadow-sm border border-light text-center">
-                    <div class="about-icon-box bg-secondary-light rounded-circle mx-auto mb-3" style="width: 72px; height: 72px;">
-                        <i class="fa fa-info-circle text-secondary fa-2x"></i>
+            <div class="col-lg-6">
+                <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm border border-light text-center">
+                    <div class="bg-secondary-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                        <i class="fa fa-info text-secondary fa-lg"></i>
                     </div>
-                    <h3 class="mb-3">WASSCE Registration Portal Currently Closed</h3>
-                    <p class="text-muted mb-4">
-                        The WASSCE registration fee amount has not yet been activated by the school administration. Please check back shortly or contact the school administration for assistance.
+                    <h4 class="mb-2 text-dark">Registration Portal Closed</h4>
+                    <p class="text-muted small mb-4">
+                        WASSCE fee collection is currently inactive. Please check back later or contact administration.
                     </p>
                     <a href="{% url 'contact' %}" class="btn btn-primary px-4 py-2">Contact Administration</a>
                 </div>
@@ -174,47 +174,47 @@
 
             <!-- Right: Fee Breakdown & Notice Card -->
             <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.2s">
-                <div class="about-identity-panel rounded-4 shadow-lg p-4 p-lg-5 text-white">
-                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-light border-opacity-10">
-                        <div class="bg-white rounded-3 p-2 me-3 shadow-sm flex-shrink-0">
+                <div class="bg-white rounded-4 shadow-sm p-4 p-lg-5 border border-light">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div class="bg-light rounded-3 p-2 me-3 border flex-shrink-0">
                             <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="48" height="48" style="object-fit: contain;">
                         </div>
                         <div>
-                            <span class="text-uppercase small fw-bold text-secondary d-block">Fee Summary</span>
-                            <h4 class="text-white mb-0">{{ fee_config.title }}</h4>
-                            <small class="text-white-50">Academic Year: {{ fee_config.academic_year }}</small>
+                            <span class="text-uppercase small fw-bold text-primary d-block">Fee Summary</span>
+                            <h4 class="text-dark mb-0">{{ fee_config.title }}</h4>
+                            <small class="text-muted">Academic Year: {{ fee_config.academic_year }}</small>
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-3 mb-4" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14);">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-white-50">WASSCE Registration Fee</span>
-                            <span class="fw-bold text-white fs-5">GHS {{ fee_config.fee_amount }}</span>
+                    <div class="p-4 rounded-3 mb-4 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-secondary small fw-medium">WASSCE Registration Fee</span>
+                            <span class="fw-bold text-dark fs-5">GHS {{ fee_config.fee_amount }}</span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-light border-opacity-10">
-                            <span class="text-white-50">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <span class="text-secondary small fw-medium">
                                 Transaction Charge ({{ fee_config.charge_percentage }}%)
-                                <small class="d-block text-secondary">Borne by sender</small>
+                                <small class="d-block text-muted">Borne by sender</small>
                             </span>
-                            <span class="fw-semi-bold text-white">GHS {{ fee_config.transaction_charge }}</span>
+                            <span class="fw-semi-bold text-dark">GHS {{ fee_config.transaction_charge }}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-secondary text-uppercase small">Total Payable</span>
-                            <span class="fw-extra-bold text-secondary fs-3">GHS {{ fee_config.total_payable }}</span>
+                            <span class="fw-bold text-dark text-uppercase small">Total Payable</span>
+                            <span class="fw-extra-bold text-primary fs-3">GHS {{ fee_config.total_payable }}</span>
                         </div>
                     </div>
 
-                    <div class="small text-white-50">
+                    <div class="small text-muted">
                         <div class="d-flex align-items-start mb-3">
-                            <i class="fa fa-check-circle text-secondary mt-1 me-3"></i>
+                            <i class="fa fa-check-circle text-primary mt-1 me-3"></i>
                             <span>Verify that your ward's <strong>Surname</strong>, <strong>Other Names</strong>, <strong>Programme</strong>, and <strong>Class</strong> match official school records.</span>
                         </div>
                         <div class="d-flex align-items-start mb-3">
-                            <i class="fa fa-mobile-alt text-secondary mt-1 me-3"></i>
+                            <i class="fa fa-mobile-alt text-primary mt-1 me-3"></i>
                             <span>Supports <strong>MTN MoMo, Telecel Cash, AT Money</strong>, and Visa/Mastercard via Paystack.</span>
                         </div>
                         <div class="d-flex align-items-start">
-                            <i class="fa fa-receipt text-secondary mt-1 me-3"></i>
+                            <i class="fa fa-receipt text-primary mt-1 me-3"></i>
                             <span>An official printable payment receipt is generated immediately after verification.</span>
                         </div>
                     </div>
