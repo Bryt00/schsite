@@ -4,16 +4,10 @@ def add_academic_year_column_if_not_exists(apps, schema_editor):
     table_name = "donations_wasscepayment"
     column_name = "academic_year"
     with schema_editor.connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT count(*)
-            FROM information_schema.columns
-            WHERE table_name = %s AND column_name = %s
-            """,
-            [table_name, column_name]
-        )
-        exists = cursor.fetchone()[0] > 0
-        if not exists:
+        columns = [
+            col.name for col in schema_editor.connection.introspection.get_table_description(cursor, table_name)
+        ]
+        if column_name not in columns:
             cursor.execute(
                 f"""
                 ALTER TABLE {table_name}
