@@ -5,7 +5,7 @@ class Paystack:
     PAYSTACK_SECRET_KEY = settings.PAYSTACK_SECRET_KEY
     base_url = 'https://api.paystack.co'
 
-    def initialize_transaction(self, email, amount_pesewas, reference, subaccount=None, bearer=None, metadata=None):
+    def initialize_transaction(self, email, amount_pesewas, reference, callback_url=None, subaccount=None, bearer=None, metadata=None):
         path = '/transaction/initialize'
         headers = {
             "Authorization": f"Bearer {self.PAYSTACK_SECRET_KEY}",
@@ -17,6 +17,8 @@ class Paystack:
             "currency": "GHS",
             "reference": reference,
         }
+        if callback_url:
+            payload["callback_url"] = callback_url
         if subaccount:
             payload["subaccount"] = subaccount
         if bearer:

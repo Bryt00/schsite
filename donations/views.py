@@ -127,10 +127,15 @@ def wassce_initialize_payment(request, reference):
         ]
     }
 
+    callback_url = request.build_absolute_uri(
+        reverse('verify_wassce_payment', args=[payment.reference])
+    )
+
     status, data = paystack.initialize_transaction(
         email=payment.payer_email_for_paystack,
         amount_pesewas=total_pesewas,
         reference=payment.reference,
+        callback_url=callback_url,
         subaccount=payment.subaccount_code or None,
         bearer="subaccount" if payment.subaccount_code else None,
         metadata=metadata,
