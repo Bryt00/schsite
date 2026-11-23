@@ -111,16 +111,10 @@ fi
 "$PY" manage.py migrate --noinput
 "$PY" manage.py collectstatic --noinput
 
-# 3. Graceful zero-downtime Gunicorn reload (SIGHUP spawns new workers before retiring old ones)
-echo "=> Sending SIGHUP to Gunicorn master process for zero-downtime worker reload..."
-MAIN_PID=$(systemctl show -p MainPID --value "$GUNICORN_SERVICE" 2>/dev/null || echo "0")
-if [ "$MAIN_PID" != "0" ] && [ -n "$MAIN_PID" ]; then
-    sudo kill -HUP "$MAIN_PID"
-    echo "✓ Gunicorn master ($GUNICORN_SERVICE, PID $MAIN_PID) gracefully reloaded workers."
-else
-    echo "=> Gunicorn ($GUNICORN_SERVICE) was not running; starting service..."
-    sudo systemctl start "$GUNICORN_SERVICE"
-fi
+# 3. Reload/Restart Gunicorn workers
+echo "=> Reloading Gunicorn ($GUNICORN_SERVICE)..."
+sudo systemctl restart "$GUNICORN_SERVICE"
+echo "✓ Gunicorn service restarted."
 
 # 4. Graceful Nginx config reload (zero-downtime)
 if sudo nginx -t >/dev/null 2>&1; then

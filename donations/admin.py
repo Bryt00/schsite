@@ -240,6 +240,7 @@ class WasscePaymentAdmin(ModelAdmin):
         'reference',
         'paid_at',
     )
+    list_select_related = ('programme', 'school_class', 'fee_config')
     list_filter = ('academic_year', 'status', 'school_class', 'programme', 'created_at')
     search_fields = ('surname', 'other_names', 'parent_phone', 'parent_name', 'reference', 'academic_year')
     readonly_fields = (
