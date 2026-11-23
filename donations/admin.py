@@ -283,47 +283,55 @@ class WasscePaymentAdmin(ModelAdmin):
         return redirect(f"{reverse('wassce_batch_receipts')}?class_ids={class_ids}")
 
     def changelist_view(self, request, extra_context=None):
-        response = super().changelist_view(request, extra_context=extra_context)
         try:
+            response = super().changelist_view(request, extra_context=extra_context)
+            if not hasattr(response, 'context_data') or 'cl' not in response.context_data:
+                return response
+
             cl = response.context_data['cl']
-            qs = cl.queryset
-        except (AttributeError, KeyError):
-            return response
+            # Use root_queryset to avoid pagination slice errors in subqueries
+            base_qs = getattr(cl, 'root_queryset', cl.queryset)
 
-        active_config = WassceFeeConfig.objects.filter(is_active=True).first()
-        selected_year = request.GET.get('academic_year') or (active_config.academic_year if active_config else "All Years")
+            active_config = WassceFeeConfig.objects.filter(is_active=True).first()
+            selected_year = request.GET.get('academic_year') or (active_config.academic_year if active_config else "All Years")
 
-        class_counts = (
-            SchoolClass.objects.select_related('programme')
-            .annotate(
-                paid_count=Count(
-                    'wassce_payments',
-                    filter=Q(wassce_payments__in=qs.filter(status='verified')),
-                ),
-                pending_count=Count(
-                    'wassce_payments',
-                    filter=Q(wassce_payments__in=qs.filter(status='pending')),
-                ),
-                net_collected=Sum(
-                    'wassce_payments__base_fee',
-                    filter=Q(wassce_payments__in=qs.filter(status='verified')),
-                ),
+            year_filter = Q(academic_year=selected_year) if (selected_year and selected_year != "All Years") else Q()
+
+            class_counts = (
+                SchoolClass.objects.select_related('programme')
+                .annotate(
+                    paid_count=Count(
+                        'wassce_payments',
+                        filter=Q(wassce_payments__status='verified') & year_filter,
+                    ),
+                    pending_count=Count(
+                        'wassce_payments',
+                        filter=Q(wassce_payments__status='pending') & year_filter,
+                    ),
+                    net_collected=Sum(
+                        'wassce_payments__base_fee',
+                        filter=Q(wassce_payments__status='verified') & year_filter,
+                    ),
+                )
+                .order_by('sort_order', 'name')
             )
-            .order_by('sort_order', 'name')
-        )
 
-        totals = qs.filter(status='verified').aggregate(
-            total_verified=Count('id'),
-            total_net=Sum('base_fee'),
-            total_gross=Sum('total_amount'),
-        )
+            totals = base_qs.filter(status='verified').aggregate(
+                total_verified=Count('id'),
+                total_net=Sum('base_fee'),
+                total_gross=Sum('total_amount'),
+            )
 
-        response.context_data['selected_academic_year'] = selected_year
-        response.context_data['class_payment_summary'] = class_counts
-        response.context_data['overall_verified_count'] = totals['total_verified'] or 0
-        response.context_data['overall_net_collected'] = totals['total_net'] or Decimal("0.00")
-        response.context_data['overall_gross_collected'] = totals['total_gross'] or Decimal("0.00")
-        return response
+            response.context_data['selected_academic_year'] = selected_year
+            response.context_data['class_payment_summary'] = class_counts
+            response.context_data['overall_verified_count'] = totals.get('total_verified') or 0
+            response.context_data['overall_net_collected'] = totals.get('total_net') or Decimal("0.00")
+            response.context_data['overall_gross_collected'] = totals.get('total_gross') or Decimal("0.00")
+            return response
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            return super().changelist_view(request, extra_context=extra_context)
 
 
 
