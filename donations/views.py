@@ -109,49 +109,54 @@ def wassce_initialize_payment(request, reference):
     Initializes transaction directly with Paystack API using the server's Secret Key
     and returns the authorized access_code for PaystackPop.
     """
-    payment = get_object_or_404(
-        WasscePayment.objects.select_related('programme', 'school_class', 'fee_config'),
-        reference=reference,
-    )
-    if payment.status == 'verified':
-        return JsonResponse({'status': False, 'message': 'Payment already verified.'})
+    try:
+        payment = get_object_or_404(
+            WasscePayment.objects.select_related('programme', 'school_class', 'fee_config'),
+            reference=reference,
+        )
+        if payment.status == 'verified':
+            return JsonResponse({'status': False, 'message': 'Payment already verified.'})
 
-    paystack = Paystack()
-    total_pesewas = int(payment.total_amount * 100)
-    metadata = {
-        "custom_fields": [
-            {"display_name": "Ward Surname", "variable_name": "ward_surname", "value": payment.surname},
-            {"display_name": "Ward Other Names", "variable_name": "ward_other_names", "value": payment.other_names},
-            {"display_name": "Programme", "variable_name": "programme", "value": payment.programme.name},
-            {"display_name": "Class", "variable_name": "school_class", "value": payment.school_class.name},
-            {"display_name": "Parent Phone", "variable_name": "parent_phone", "value": payment.parent_phone},
-        ]
-    }
+        paystack = Paystack()
+        total_pesewas = int(payment.total_amount * 100)
+        metadata = {
+            "custom_fields": [
+                {"display_name": "Ward Surname", "variable_name": "ward_surname", "value": payment.surname},
+                {"display_name": "Ward Other Names", "variable_name": "ward_other_names", "value": payment.other_names},
+                {"display_name": "Programme", "variable_name": "programme", "value": payment.programme.name if payment.programme else ""},
+                {"display_name": "Class", "variable_name": "school_class", "value": payment.school_class.name if payment.school_class else ""},
+                {"display_name": "Parent Phone", "variable_name": "parent_phone", "value": payment.parent_phone},
+            ]
+        }
 
-    callback_url = request.build_absolute_uri(
-        reverse('verify_wassce_payment', args=[payment.reference])
-    )
+        callback_url = request.build_absolute_uri(
+            reverse('verify_wassce_payment', args=[payment.reference])
+        )
 
-    status, data = paystack.initialize_transaction(
-        email=payment.payer_email_for_paystack,
-        amount_pesewas=total_pesewas,
-        reference=payment.reference,
-        callback_url=callback_url,
-        subaccount=payment.subaccount_code or None,
-        bearer="subaccount" if payment.subaccount_code else None,
-        metadata=metadata,
-    )
+        status, data = paystack.initialize_transaction(
+            email=payment.payer_email_for_paystack,
+            amount_pesewas=total_pesewas,
+            reference=payment.reference,
+            callback_url=callback_url,
+            subaccount=payment.subaccount_code or None,
+            bearer="subaccount" if payment.subaccount_code else None,
+            metadata=metadata,
+        )
 
-    if status and isinstance(data, dict):
-        return JsonResponse({
-            'status': True,
-            'access_code': data.get('access_code'),
-            'authorization_url': data.get('authorization_url'),
-            'reference': payment.reference,
-        })
-    else:
-        err_msg = data if isinstance(data, str) else "Could not initialize transaction with Paystack."
-        return JsonResponse({'status': False, 'message': err_msg}, status=400)
+        if status and isinstance(data, dict):
+            return JsonResponse({
+                'status': True,
+                'access_code': data.get('access_code'),
+                'authorization_url': data.get('authorization_url'),
+                'reference': payment.reference,
+            })
+        else:
+            err_msg = data if isinstance(data, str) else "Could not initialize transaction with Paystack."
+            return JsonResponse({'status': False, 'message': err_msg}, status=400)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'status': False, 'message': f"Internal Server Error: {str(e)}"}, status=500)
 
 
 
