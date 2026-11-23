@@ -27,75 +27,14 @@ class SchoolClassAdmin(ModelAdmin):
     list_display = (
         'name',
         'programme',
-        'active_year_paid_count',
-        'total_paid_count',
-        'pending_count',
-        'total_fee_collected',
-        'view_paid_students_link',
-        'generate_class_receipts_link',
         'sort_order',
         'is_active',
+        'created_at',
     )
     list_filter = ('is_active', 'programme')
     search_fields = ('name', 'programme__name')
     ordering = ('sort_order', 'name')
-    actions = ['generate_receipts_for_selected_classes']
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        active_config = WassceFeeConfig.objects.filter(is_active=True).first()
-        active_year = active_config.academic_year if active_config else None
-
-        annotations = {
-            '_total_paid': Count('wassce_payments', filter=Q(wassce_payments__status='verified')),
-            '_pending': Count('wassce_payments', filter=Q(wassce_payments__status='pending')),
-            '_net_collected': Sum('wassce_payments__base_fee', filter=Q(wassce_payments__status='verified')),
-        }
-        if active_year:
-            annotations['_active_year_paid'] = Count(
-                'wassce_payments',
-                filter=Q(wassce_payments__status='verified', wassce_payments__academic_year=active_year),
-            )
-        return qs.annotate(**annotations)
-
-    @admin.display(description="Paid (Active Year)", ordering='_total_paid')
-    def active_year_paid_count(self, obj):
-        count = getattr(obj, '_active_year_paid', getattr(obj, '_total_paid', 0))
-        return f"{count} student{'s' if count != 1 else ''}"
-
-    @admin.display(description="Total Paid (All Time)", ordering='_total_paid')
-    def total_paid_count(self, obj):
-        return getattr(obj, '_total_paid', 0)
-
-    @admin.display(description="Pending", ordering='_pending')
-    def pending_count(self, obj):
-        return getattr(obj, '_pending', 0)
-
-    @admin.display(description="Net Fee Collected", ordering='_net_collected')
-    def total_fee_collected(self, obj):
-        total = getattr(obj, '_net_collected', None) or Decimal("0.00")
-        return f"GHS {total:,.2f}"
-
-    @admin.display(description="Students")
-    def view_paid_students_link(self, obj):
-        url = f"{reverse('admin:donations_wasscepayment_changelist')}?school_class__id__exact={obj.id}&status__exact=verified"
-        return format_html('<a href="{}" style="font-weight:600; color:#0f7694;">View Paid &rarr;</a>', url)
-
-    @admin.display(description="Class Receipts")
-    def generate_class_receipts_link(self, obj):
-        url = reverse('wassce_class_receipts', args=[obj.id])
-        return format_html(
-            '<a href="{}" target="_blank" style="display:inline-block; padding:4px 10px; border-radius:6px; background:#0f7694; color:#fff; font-weight:600; font-size:0.8rem; text-decoration:none;">'
-            'Generate Class Receipts'
-            '</a>',
-            url,
-        )
-
-    @admin.action(description="Generate printable receipts for all verified students in selected class(es)")
-    def generate_receipts_for_selected_classes(self, request, queryset):
-        class_ids = ",".join(str(c.id) for c in queryset)
-        url = f"{reverse('wassce_batch_receipts')}?class_ids={class_ids}"
-        return redirect(url)
 
 
 @admin.register(WassceFeeConfig)
