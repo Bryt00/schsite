@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="bg-white rounded-4 shadow-sm border border-light p-4 p-lg-5" id="printable-receipt">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-4 mb-4 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="60" height="60" class="me-3">
+                            <div>
+                                <h4 class="mb-0 text-primary">New Juaben Senior High Commercial School</h4>
+                                <small class="text-muted">Koforidua, Eastern Region - Ghana • "DAASEBRE MMA"</small>
+                            </div>
+                        </div>
+                        <div class="text-sm-end">
+                            <span class="badge bg-success px-3 py-2 rounded-pill mb-1">
+                                <i class="fa fa-check-circle me-1"></i>PAYMENT VERIFIED
+                            </span>
+                            <div class="small text-muted">Ref: <strong>{{ payment.reference }}</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h3 class="mb-1">Official WASSCE Registration Fee Receipt</h3>
+                        <p class="text-muted small mb-0">
+                            Paid on {{ payment.paid_at|default:payment.created_at|date:"F d, Y - h:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="row g-3 p-4 bg-light rounded-3 mb-4 border">
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Candidate Surname</span>
+                            <span class="fw-bold text-dark fs-5">{{ payment.surname|upper }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Candidate Other Names</span>
+                            <span class="fw-bold text-dark fs-5">{{ payment.other_names }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Academic Programme</span>
+                            <span class="fw-semi-bold text-dark">{{ payment.programme.name }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Class</span>
+                            <span class="fw-semi-bold text-dark">{{ payment.school_class.name }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Parent / Guardian Phone</span>
+                            <span class="fw-semi-bold text-dark">{{ payment.parent_phone }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Parent / Guardian Name</span>
+                            <span class="fw-semi-bold text-dark">{{ payment.parent_name|default:"—" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-3 border mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">WASSCE Registration Fee</span>
+                            <span class="fw-semi-bold">GHS {{ payment.base_fee }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span class="text-muted">Transaction Charge (Borne by Sender)</span>
+                            <span class="fw-semi-bold">GHS {{ payment.transaction_charge }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark fs-5">Total Amount Paid</span>
+                            <span class="fw-extra-bold text-success fs-4">GHS {{ payment.total_amount }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 justify-content-center d-print-none">
+                        <button type="button" class="btn btn-primary px-4 py-2" onclick="window.print()">
+                            <i class="fa fa-print me-2"></i>Print Receipt
+                        </button>
+                        <a href="{% url 'wassce_registration' %}" class="btn btn-outline-primary px-4 py-2">
+                            Make Another Payment
+                        </a>
+                        <a href="{% url 'index' %}" class="btn btn-light px-4 py-2">
+                            Return Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

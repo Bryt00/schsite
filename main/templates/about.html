@@ -6,93 +6,189 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-10 text-center">
-                <h1 class="display-3 text-white animated slideInDown">About Us</h1>
-                <p class="text-white-50 fs-4 animated slideInDown">"DAASEBRE MMA"</p>
-                <!--                    <nav aria-label="breadcrumb">-->
-                <!--                        <ol class="breadcrumb justify-content-center">-->
-                <!--                            <li class="breadcrumb-item"><a class="text-white" href="#">Home</a></li>-->
-                <!--                            <li class="breadcrumb-item"><a class="text-white" href="#">Pages</a></li>-->
-                <!--                            <li class="breadcrumb-item text-white active" aria-current="page">About</li>-->
-                <!--                        </ol>-->
-                <!--                    </nav>-->
+                <span class="badge bg-secondary text-dark fw-bold px-3 py-2 rounded-pill mb-3 text-uppercase tracking-wider animated slideInDown">
+                    Koforidua • Eastern Region, Ghana
+                </span>
+                <h1 class="display-3 text-white animated slideInDown">About NJUASCO</h1>
+                <p class="text-white-50 fs-4 mb-0 animated slideInDown">"DAASEBRE MMA"</p>
             </div>
         </div>
     </div>
 </div>
 <!-- Header End -->
 
-{% include 'services.html' %}
-
-
-<!-- About Start -->
+<!-- Institutional Overview Start (No Stock Photo) -->
 <div class="container-xxl py-5">
     <div class="container">
-        <div class="row g-5 align-items-center">
-            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="position-relative overflow-hidden rounded-4 shadow-lg">
-                    <img alt="About NJUASCO" class="img-fluid w-100" src="{% if about.image %}{{ about.image.url }}{% else %}{% static 'img/about_fallback.png' %}{% endif %}"
-                        style="object-fit: cover; min-height: 450px;">
+        <div class="row g-5 align-items-stretch">
+            <!-- Left: Institutional Story & Overview -->
+            <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="about-overview-card bg-white rounded-4 shadow-sm p-4 p-lg-5 h-100 border border-light">
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-light text-primary fw-semi-bold small mb-3">
+                        <i class="fa fa-university"></i>
+                        <span>Who We Are</span>
+                    </div>
+                    <h1 class="mb-2">{{ about.title|default:"New Juaben Senior High Commercial School" }}</h1>
+                    <p class="text-primary fw-bold mb-4 fst-italic">"DAASEBRE MMA" — Excellence, Integrity &amp; Service</p>
+
+                    {% if about.subtitle %}
+                    <div class="lead text-dark mb-4">{{ about.subtitle|safe }}</div>
+                    {% else %}
+                    <p class="lead text-dark mb-4">
+                        New Juaben Senior High Commercial School (NJUASCO) is a premier second-cycle institution in Koforidua, committed to nurturing disciplined, innovative, and ethically grounded leaders.
+                    </p>
+                    {% endif %}
+
+                    <div class="text-muted about-description">
+                        {% if about.description %}
+                            {{ about.description|safe }}
+                        {% else %}
+                            <p class="mb-3">
+                                Rooted in a proud heritage of academic and commercial excellence, NJUASCO provides a structured, supportive, and intellectually rigorous environment where students discover their strengths and prepare for higher education and purposeful careers.
+                            </p>
+                            <p class="mb-0">
+                                Guided by dedicated educators and strong moral values, our students—proudly known as <strong>Daasebre Mma</strong>—consistently excel across the sciences, business, arts, vocational disciplines, and civic leadership.
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4 pt-3 border-top border-light">
+                        <a href="{% url 'courses' %}" class="btn btn-primary px-4 py-2">
+                            <i class="fa fa-book-open me-2"></i>Explore Programmes
+                        </a>
+                        <a href="{% url 'staff' %}" class="btn btn-outline-primary px-4 py-2">
+                            <i class="fa fa-users me-2"></i>School Leadership
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
-                <h6 class="section-title text-start mb-3">About Us</h6>
-                <h1 class="mb-2">{{ about.title }}</h1>
-                <h5 class="text-primary mb-4 italic">"DAASEBRE MMA"</h5>
-                <div class="lead mb-4">{{ about.subtitle|safe }}</div>
 
-                <div class="row g-4 mt-2">
-                    <!-- Our Vision -->
-                    <div class="col-md-12">
-                        <div
-                            class="p-4 bg-white rounded-4 shadow-sm border-start border-4 border-primary h-100 hvr-shadow">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="flex-shrink-0 btn-square bg-primary-light rounded-circle">
-                                    <i class="fa fa-eye text-primary"></i>
-                                </div>
-                                <h4 class="ms-3 mb-0 text-primary">Our Vision</h4>
+            <!-- Right: Institutional Identity & Key Pillars Panel -->
+            <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="about-identity-panel rounded-4 shadow-lg p-4 p-lg-5 h-100 d-flex flex-column justify-content-between text-white">
+                    <div>
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-light border-opacity-10">
+                            <div class="about-crest-badge bg-white rounded-3 p-2 me-3 shadow-sm flex-shrink-0">
+                                <img src="{% static 'img/logo.png' %}" alt="NJUASCO Crest" width="54" height="54" style="object-fit: contain;">
                             </div>
-                            <div class="m-0 text-dark">{{ about.vision|safe }}</div>
+                            <div>
+                                <span class="text-uppercase small fw-bold text-secondary d-block">Institutional Identity</span>
+                                <h4 class="text-white mb-0">NJUASCO</h4>
+                                <small class="text-white-50">Motto: "Daasebre Mma"</small>
+                            </div>
+                        </div>
+
+                        <p class="text-white-50 mb-4">
+                            Our educational philosophy balances rigorous classroom instruction with practical competence, moral discipline, and community responsibility.
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="about-stat-tile p-3 rounded-3 h-100">
+                                    <div class="text-secondary mb-2"><i class="fa fa-graduation-cap fa-lg"></i></div>
+                                    <h6 class="text-white mb-1">5+ Programmes</h6>
+                                    <p class="text-white-50 small mb-0">Science, Business, General Arts, Visual Arts &amp; Home Economics</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="about-stat-tile p-3 rounded-3 h-100">
+                                    <div class="text-secondary mb-2"><i class="fa fa-award fa-lg"></i></div>
+                                    <h6 class="text-white mb-1">Academic Rigor</h6>
+                                    <p class="text-white-50 small mb-0">Structured preparation for WASSCE &amp; tertiary success</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="about-stat-tile p-3 rounded-3 h-100">
+                                    <div class="text-secondary mb-2"><i class="fa fa-shield-alt fa-lg"></i></div>
+                                    <h6 class="text-white mb-1">Character First</h6>
+                                    <p class="text-white-50 small mb-0">Grounded in integrity, respect, and civic duty</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="about-stat-tile p-3 rounded-3 h-100">
+                                    <div class="text-secondary mb-2"><i class="fa fa-chalkboard-teacher fa-lg"></i></div>
+                                    <h6 class="text-white mb-1">Expert Mentors</h6>
+                                    <p class="text-white-50 small mb-0">Dedicated teaching and non-teaching professionals</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Our Mission -->
-                    <div class="col-md-12">
-                        <div
-                            class="p-4 bg-white rounded-4 shadow-sm border-start border-4 border-secondary h-100 hvr-shadow">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="flex-shrink-0 btn-square bg-secondary-light rounded-circle">
-                                    <i class="fa fa-bullseye text-secondary"></i>
-                                </div>
-                                <h4 class="ms-3 mb-0 text-secondary">Our Mission</h4>
-                            </div>
-                            <div class="m-0 text-dark">{{ about.mission|safe }}</div>
-                        </div>
+
+                    <div class="mt-4 pt-3 border-top border-light border-opacity-10 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="small text-white-50">
+                            <i class="fa fa-map-marker-alt text-secondary me-2"></i>Koforidua, Eastern Region - Ghana
+                        </span>
+                        <a href="{% url 'contact' %}" class="text-secondary text-decoration-none small fw-bold">
+                            Contact Administration <i class="fa fa-arrow-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row pt-5 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="col-12">
-                <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
-                    <div class="m-0 lead text-dark">{{ about.description|safe }}</div>
+
+        <!-- Vision & Mission Side-by-Side Cards -->
+        <div class="row g-4 mt-3">
+            <!-- Our Vision -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="about-pillar-card p-4 p-lg-5 bg-white rounded-4 shadow-sm border-top border-4 border-primary h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 about-icon-box bg-primary-light rounded-3">
+                            <i class="fa fa-eye text-primary fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <span class="text-uppercase small fw-bold text-muted d-block">Future Outlook</span>
+                            <h3 class="mb-0 text-primary">Our Vision</h3>
+                        </div>
+                    </div>
+                    <div class="m-0 text-dark fs-6">
+                        {% if about.vision %}
+                            {{ about.vision|safe }}
+                        {% else %}
+                            To be a center of excellence in second-cycle education, producing intellectually sound, morally upright, and globally competitive graduates equipped to lead and transform society.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Our Mission -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="about-pillar-card p-4 p-lg-5 bg-white rounded-4 shadow-sm border-top border-4 border-secondary h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 about-icon-box bg-secondary-light rounded-3">
+                            <i class="fa fa-bullseye text-secondary fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <span class="text-uppercase small fw-bold text-muted d-block">Core Mandate</span>
+                            <h3 class="mb-0 text-dark">Our Mission</h3>
+                        </div>
+                    </div>
+                    <div class="m-0 text-dark fs-6">
+                        {% if about.mission %}
+                            {{ about.mission|safe }}
+                        {% else %}
+                            To deliver holistic, high-quality education through effective teaching, strong moral mentorship, practical skill development, and a disciplined learning environment that unlocks every student's full potential.
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- About End -->
+<!-- Institutional Overview End -->
 
+{% include 'services.html' %}
 
 <!-- Team Start -->
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="section-title text-center mb-3">Our Educators</h6>
-            <h1 class="mb-5">Expert School Staff</h1>
+            <h1 class="mb-5">School Leadership &amp; Staff</h1>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             {% for staff in staffs %}
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="team-item text-center p-4">
+                <div class="team-item text-center p-4 h-100">
                     <div class="staff-avatar-container mx-auto mb-4">
                         <div class="staff-icon-circle bg-primary-light">
                             {% if staff.use_icon %}
@@ -106,22 +202,24 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <h5 class="mb-1 fw-bold">{{ staff.name }}</h5>
+                        <h5 class="mb-1 fw-bold">
+                            <a href="{% url 'staff_details' staff.id %}" class="text-dark text-decoration-none">{{ staff.name }}</a>
+                        </h5>
                         <div class="badge bg-secondary-light text-secondary px-3 py-2 rounded-pill small">
                             {{ staff.designation }}
                         </div>
                     </div>
                     <div class="d-flex justify-content-center">
-                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
-                                class="fab fa-twitter"></i></a>
-                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href=""><i
-                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-square btn-light text-primary mx-1 shadow-sm" href="{% url 'staff_details' staff.id %}">
+                            <i class="fa fa-id-badge"></i>
+                        </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <div class="text-center mt-5 wow fadeInUp" data-wow-delay="0.1s">
+            <a href="{% url 'staff' %}" class="btn btn-primary py-3 px-5 rounded-pill shadow-sm">View Full Staff Directory</a>
         </div>
     </div>
 </div>

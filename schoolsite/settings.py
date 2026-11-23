@@ -100,9 +100,29 @@ UNFOLD = {
                         "icon": "school",
                     },
                     {
+                        "title": "School Classes",
+                        "link": "/admin/donations/schoolclass/",
+                        "icon": "class",
+                    },
+                    {
                         "title": "School Staff",
                         "link": "/admin/main/staff/",
                         "icon": "people",
+                    },
+                ],
+            },
+            {
+                "title": "WASSCE Collections",
+                "items": [
+                    {
+                        "title": "WASSCE Fee Settings",
+                        "link": "/admin/donations/wasscefeeconfig/",
+                        "icon": "tune",
+                    },
+                    {
+                        "title": "WASSCE Payments",
+                        "link": "/admin/donations/wasscepayment/",
+                        "icon": "payments",
                     },
                 ],
             },
@@ -226,6 +246,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type# Paystack Configuration
 PAYSTACK_PUBLIC_KEY = env('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')
+PAYSTACK_WASSCE_SUBACCOUNT = env('PAYSTACK_WASSCE_SUBACCOUNT', default='')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="bg-white rounded-4 shadow-sm border border-light overflow-hidden">
+                    <!-- Top Header Banner -->
+                    <div class="about-identity-panel p-4 p-lg-5 text-white">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-white rounded-3 p-2 me-3 shadow-sm">
+                                    <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="48" height="48" style="object-fit: contain;">
+                                </div>
+                                <div>
+                                    <span class="text-uppercase small fw-bold text-secondary d-block">Step 2 of 2 • Checkout</span>
+                                    <h3 class="text-white mb-0">Confirm &amp; Complete Payment</h3>
+                                </div>
+                            </div>
+                            <span class="badge bg-secondary text-dark px-3 py-2 rounded-pill fw-bold">
+                                Ref: {{ payment.reference }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Ward & Fee Summary Body -->
+                    <div class="p-4 p-lg-5">
+                        <h6 class="text-uppercase small fw-bold text-primary mb-3">
+                            <i class="fa fa-user-graduate me-2"></i>Candidate Summary
+                        </h6>
+                        <div class="row g-3 p-3 bg-light rounded-3 mb-4 border">
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Ward's Surname</span>
+                                <span class="fw-bold text-dark">{{ payment.surname|upper }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Ward's Other Names</span>
+                                <span class="fw-bold text-dark">{{ payment.other_names }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Programme</span>
+                                <span class="fw-semi-bold text-dark">{{ payment.programme.name }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Class</span>
+                                <span class="fw-semi-bold text-dark">{{ payment.school_class.name }}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Parent / Guardian Phone</span>
+                                <span class="fw-semi-bold text-dark">{{ payment.parent_phone }}</span>
+                            </div>
+                            {% if payment.parent_name %}
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Parent / Guardian Name</span>
+                                <span class="fw-semi-bold text-dark">{{ payment.parent_name }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <h6 class="text-uppercase small fw-bold text-primary mb-3">
+                            <i class="fa fa-file-invoice-dollar me-2"></i>Payment Breakdown
+                        </h6>
+                        <div class="p-4 rounded-3 border mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">WASSCE Registration Fee</span>
+                                <span class="fw-semi-bold text-dark">GHS {{ payment.base_fee }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <span class="text-muted">
+                                    Transaction Charge
+                                    <span class="badge bg-secondary-light text-secondary ms-1">Borne by Sender</span>
+                                </span>
+                                <span class="fw-semi-bold text-dark">GHS {{ payment.transaction_charge }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark fs-5">Total Payable Now</span>
+                                <span class="fw-extra-bold text-primary fs-3">GHS {{ payment.total_amount }}</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-lg w-100 py-3 shadow-sm mb-3" onclick="payWassceWithPaystack()">
+                            <i class="fa fa-lock me-2"></i>Pay GHS {{ payment.total_amount }} with Paystack
+                        </button>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2">
+                            <a href="{% url 'wassce_registration' %}" class="text-muted text-decoration-none small">
+                                <i class="fa fa-arrow-left me-1"></i>Edit Ward Details
+                            </a>
+                            <span class="small text-muted">
+                                <i class="fa fa-shield-alt text-primary me-1"></i>Secured by Paystack (MoMo &amp; Card)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    function payWassceWithPaystack() {
+        const totalPesewas = Math.round(parseFloat("{{ payment.total_amount }}") * 100);
+        const subaccountCode = "{{ payment.subaccount_code|escapejs }}";
+
+        const paystackOptions = {
+            key: "{{ paystack_public_key|escapejs }}",
+            email: "{{ payment.payer_email_for_paystack|escapejs }}",
+            amount: totalPesewas,
+            currency: "GHS",
+            ref: "{{ payment.reference|escapejs }}",
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Payment Type",
+                        variable_name: "payment_type",
+                        value: "WASSCE Registration Fee"
+                    },
+                    {
+                        display_name: "Ward Surname",
+                        variable_name: "ward_surname",
+                        value: "{{ payment.surname|escapejs }}"
+                    },
+                    {
+                        display_name: "Ward Other Names",
+                        variable_name: "ward_other_names",
+                        value: "{{ payment.other_names|escapejs }}"
+                    },
+                    {
+                        display_name: "Programme",
+                        variable_name: "programme",
+                        value: "{{ payment.programme.name|escapejs }}"
+                    },
+                    {
+                        display_name: "Class",
+                        variable_name: "school_class",
+                        value: "{{ payment.school_class.name|escapejs }}"
+                    },
+                    {
+                        display_name: "Parent Phone",
+                        variable_name: "parent_phone",
+                        value: "{{ payment.parent_phone|escapejs }}"
+                    },
+                    {
+                        display_name: "Base WASSCE Fee (GHS)",
+                        variable_name: "base_fee",
+                        value: "{{ payment.base_fee }}"
+                    },
+                    {
+                        display_name: "Transaction Charge (GHS)",
+                        variable_name: "transaction_charge",
+                        value: "{{ payment.transaction_charge }}"
+                    }
+                ]
+            },
+            callback: function (response) {
+                window.location.href = "{% url 'verify_wassce_payment' payment.reference %}";
+            },
+            onClose: function () {
+                // Allow parent to retry payment directly from checkout page
+            }
+        };
+
+        if (subaccountCode) {
+            paystackOptions.subaccount = subaccountCode;
+            paystackOptions.bearer = "subaccount";
+        }
+
+        const handler = PaystackPop.setup(paystackOptions);
+        handler.openIframe();
+    }
+</script>
+{% endblock content %}
+

@@ -24,7 +24,9 @@ def index(request):
 
 def about(request):
     about_data = About.objects.all()[:1]
-    staffs = Staff.objects.all()[:4]
+    staffs = Staff.objects.filter(is_leadership=True).order_by('sort_order', 'id')[:4]
+    if not staffs.exists():
+        staffs = Staff.objects.all()[:4]
     about = None
     if len(about_data) > 0:
         about = about_data[0]
