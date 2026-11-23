@@ -38,6 +38,25 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
+    <script>
+        // Failsafe: ensure spinner never permanently covers the page
+        (function() {
+            function removeSpinner() {
+                var s = document.getElementById('spinner');
+                if (s) {
+                    s.classList.remove('show');
+                    s.style.display = 'none';
+                }
+            }
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(removeSpinner, 50);
+            } else {
+                window.addEventListener('DOMContentLoaded', removeSpinner);
+                window.addEventListener('load', removeSpinner);
+                setTimeout(removeSpinner, 800);
+            }
+        })();
+    </script>
     <!-- Spinner End -->
 
     <!-- Navbar Start -->
