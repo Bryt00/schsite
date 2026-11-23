@@ -107,14 +107,20 @@
 
         try {
             const initResponse = await fetch("{% url 'wassce_initialize_payment' payment.reference %}");
-            const data = await initResponse.json();
+            let data;
+            const textResponse = await initResponse.text();
+            try {
+                data = JSON.parse(textResponse);
+            } catch (jsonErr) {
+                console.error("Non-JSON response from server:", textResponse);
+                throw new Error("Server error occurred while preparing transaction. Please try again.");
+            }
 
             if (!initResponse.ok || !data.status || !data.authorization_url) {
                 throw new Error(data.message || "Failed to initialize payment with Paystack.");
             }
 
             // Redirect directly to Paystack's official checkout page
-            // This guarantees 100% compatibility for subaccounts, MoMo, and cards with zero iframe/popup errors
             window.location.href = data.authorization_url;
 
         } catch (err) {
