@@ -67,10 +67,7 @@
                                 <span class="fw-semi-bold text-dark">GHS {{ payment.base_fee }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                                <span class="text-muted">
-                                    Transaction Charge
-                                    <span class="badge bg-secondary-light text-secondary ms-1">Borne by Sender</span>
-                                </span>
+                                <span class="text-muted">Transaction Charge</span>
                                 <span class="fw-semi-bold text-dark">GHS {{ payment.transaction_charge }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
@@ -79,9 +76,10 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary btn-lg w-100 py-3 shadow-sm mb-3" onclick="payWassceWithPaystack()">
+                        <button type="button" id="payButton" class="btn btn-primary btn-lg w-100 py-3 shadow-sm mb-3" onclick="payWassceWithPaystack()">
                             <i class="fa fa-lock me-2"></i>Pay GHS {{ payment.total_amount }} with Paystack
                         </button>
+                        <div id="paymentError" class="alert alert-danger d-none rounded-3 small mb-3"></div>
 
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2">
                             <a href="{% url 'wassce_registration' %}" class="text-muted text-decoration-none small">
@@ -100,75 +98,39 @@
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-    function payWassceWithPaystack() {
-        const totalPesewas = Math.round(parseFloat("{{ payment.total_amount }}") * 100);
-        const subaccountCode = "{{ payment.subaccount_code|escapejs }}";
+    async function payWassceWithPaystack() {
+        const btn = document.getElementById("payButton");
+        const errBox = document.getElementById("paymentError");
+        errBox.classList.add("d-none");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting to Paystack...';
 
-        const paystackOptions = {
-            key: "{{ paystack_public_key|escapejs }}",
-            email: "{{ payment.payer_email_for_paystack|escapejs }}",
-            amount: totalPesewas,
-            currency: "GHS",
-            ref: "{{ payment.reference|escapejs }}",
-            metadata: {
-                custom_fields: [
-                    {
-                        display_name: "Payment Type",
-                        variable_name: "payment_type",
-                        value: "WASSCE Registration Fee"
-                    },
-                    {
-                        display_name: "Ward Surname",
-                        variable_name: "ward_surname",
-                        value: "{{ payment.surname|escapejs }}"
-                    },
-                    {
-                        display_name: "Ward Other Names",
-                        variable_name: "ward_other_names",
-                        value: "{{ payment.other_names|escapejs }}"
-                    },
-                    {
-                        display_name: "Programme",
-                        variable_name: "programme",
-                        value: "{{ payment.programme.name|escapejs }}"
-                    },
-                    {
-                        display_name: "Class",
-                        variable_name: "school_class",
-                        value: "{{ payment.school_class.name|escapejs }}"
-                    },
-                    {
-                        display_name: "Parent Phone",
-                        variable_name: "parent_phone",
-                        value: "{{ payment.parent_phone|escapejs }}"
-                    },
-                    {
-                        display_name: "Base WASSCE Fee (GHS)",
-                        variable_name: "base_fee",
-                        value: "{{ payment.base_fee }}"
-                    },
-                    {
-                        display_name: "Transaction Charge (GHS)",
-                        variable_name: "transaction_charge",
-                        value: "{{ payment.transaction_charge }}"
-                    }
-                ]
-            },
-            callback: function (response) {
-                window.location.href = "{% url 'verify_wassce_payment' payment.reference %}";
-            },
-            onClose: function () {
-                // Allow parent to retry payment directly from checkout page
+        try {
+            const initResponse = await fetch("{% url 'wassce_initialize_payment' payment.reference %}");
+            const data = await initResponse.json();
+
+            if (!initResponse.ok || !data.status || !data.access_code) {
+                throw new Error(data.message || "Failed to initialize payment with Paystack.");
             }
-        };
 
-        if (subaccountCode) {
-            paystackOptions.subaccount = subaccountCode;
-            paystackOptions.bearer = "subaccount";
+            const handler = PaystackPop.setup({
+                key: "{{ paystack_public_key|escapejs }}",
+                access_code: data.access_code,
+                callback: function (response) {
+                    window.location.href = "{% url 'verify_wassce_payment' payment.reference %}";
+                },
+                onClose: function () {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa fa-lock me-2"></i>Pay GHS {{ payment.total_amount }} with Paystack';
+                }
+            });
+            handler.openIframe();
+        } catch (err) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-lock me-2"></i>Pay GHS {{ payment.total_amount }} with Paystack';
+            errBox.textContent = err.message || "An error occurred while connecting to Paystack.";
+            errBox.classList.remove("d-none");
         }
-
-        const handler = PaystackPop.setup(paystackOptions);
-        handler.openIframe();
     }
 </script>
 {% endblock content %}

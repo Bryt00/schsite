@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib import messages
@@ -100,6 +101,52 @@ def wassce_checkout(request, reference):
         'payment': payment,
         'paystack_public_key': settings.PAYSTACK_PUBLIC_KEY,
     })
+
+
+def wassce_initialize_payment(request, reference):
+    """
+    Initializes transaction directly with Paystack API using the server's Secret Key
+    and returns the authorized access_code for PaystackPop.
+    """
+    payment = get_object_or_404(
+        WasscePayment.objects.select_related('programme', 'school_class', 'fee_config'),
+        reference=reference,
+    )
+    if payment.status == 'verified':
+        return JsonResponse({'status': False, 'message': 'Payment already verified.'})
+
+    paystack = Paystack()
+    total_pesewas = int(payment.total_amount * 100)
+    metadata = {
+        "custom_fields": [
+            {"display_name": "Ward Surname", "variable_name": "ward_surname", "value": payment.surname},
+            {"display_name": "Ward Other Names", "variable_name": "ward_other_names", "value": payment.other_names},
+            {"display_name": "Programme", "variable_name": "programme", "value": payment.programme.name},
+            {"display_name": "Class", "variable_name": "school_class", "value": payment.school_class.name},
+            {"display_name": "Parent Phone", "variable_name": "parent_phone", "value": payment.parent_phone},
+        ]
+    }
+
+    status, data = paystack.initialize_transaction(
+        email=payment.payer_email_for_paystack,
+        amount_pesewas=total_pesewas,
+        reference=payment.reference,
+        subaccount=payment.subaccount_code or None,
+        bearer="subaccount" if payment.subaccount_code else None,
+        metadata=metadata,
+    )
+
+    if status and isinstance(data, dict):
+        return JsonResponse({
+            'status': True,
+            'access_code': data.get('access_code'),
+            'authorization_url': data.get('authorization_url'),
+            'reference': payment.reference,
+        })
+    else:
+        err_msg = data if isinstance(data, str) else "Could not initialize transaction with Paystack."
+        return JsonResponse({'status': False, 'message': err_msg}, status=400)
+
 
 
 def verify_wassce_payment(request, reference):
