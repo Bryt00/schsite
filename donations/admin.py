@@ -197,15 +197,45 @@ class WasscePaymentAdmin(ModelAdmin):
 
     @admin.display(description="Receipt")
     def generate_receipt_button(self, obj):
-        if obj.status != 'verified':
+        if not obj or obj.status != 'verified':
             return format_html('<span style="color:#94a3b8; font-size:0.8rem;">Unverified</span>')
-        url = reverse('wassce_receipt', args=[obj.reference])
-        return format_html(
-            '<a href="{}" target="_blank" style="display:inline-block; padding:4px 10px; border-radius:6px; background:#15803d; color:#fff; font-weight:600; font-size:0.8rem; text-decoration:none;">'
-            'Print Receipt'
-            '</a>',
-            url,
-        )
+        try:
+            url = reverse('wassce_receipt', args=[obj.reference])
+            return format_html(
+                '<a href="{}" target="_blank" style="display:inline-block; padding:4px 10px; border-radius:6px; background:#15803d; color:#fff; font-weight:600; font-size:0.8rem; text-decoration:none;">'
+                'Print Receipt'
+                '</a>',
+                url,
+            )
+        except Exception:
+            return format_html('<span style="color:#94a3b8; font-size:0.8rem;">—</span>')
+
+    def changelist_view(self, request, extra_context=None):
+        try:
+            # Self-heal: ensure academic_year column exists in table if migrate hasn't run yet
+            from django.db import connection
+            with connection.cursor() as cursor:
+                columns = [
+                    col.name for col in connection.introspection.get_table_description(cursor, 'donations_wasscepayment')
+                ]
+                if columns and 'academic_year' not in columns:
+                    cursor.execute(
+                        "ALTER TABLE donations_wasscepayment ADD COLUMN academic_year varchar(50) NOT NULL DEFAULT '2025/2026';"
+                    )
+            return super().changelist_view(request, extra_context=extra_context)
+        except Exception as e:
+            import traceback, sys
+            print("=== ERROR IN WasscePaymentAdmin.changelist_view ===", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            from django.http import HttpResponse
+            return HttpResponse(
+                f"<div style='font-family:sans-serif; padding:2rem; background:#fee2e2; border:1px solid #ef4444; border-radius:8px; margin:2rem; color:#991b1b;'>"
+                f"<h2>WASSCE Payment Admin Diagnostic</h2>"
+                f"<p><strong>Exception:</strong> {e.__class__.__name__}: {e}</p>"
+                f"<pre style='background:#fff; padding:1rem; border-radius:4px; overflow-x:auto; color:#111;'>{traceback.format_exc()}</pre>"
+                f"</div>",
+                status=200
+            )
 
     @admin.action(description="Generate printable receipt(s) for selected verified student(s)")
     def generate_receipts_for_selected_payments(self, request, queryset):
