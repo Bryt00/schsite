@@ -41,8 +41,14 @@
             background: #f0fdf4;
         }
         @media print {
-            body {
+            @page {
+                size: A4 portrait;
+                margin: 12mm;
+            }
+            html, body {
                 background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .no-print {
                 display: none !important;
@@ -54,7 +60,8 @@
             }
             .receipt-card {
                 box-shadow: none !important;
-                border: 1px solid #94a3b8 !important;
+                border: 1.5px solid #94a3b8 !important;
+                border-top: 4px solid #0f7694 !important;
                 margin-bottom: 1.25rem !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
@@ -62,6 +69,10 @@
             body.one-per-page .receipt-card {
                 page-break-after: always !important;
                 break-after: page !important;
+            }
+            body.one-per-page .receipt-card:last-child {
+                page-break-after: auto !important;
+                break-after: auto !important;
             }
         }
     </style>

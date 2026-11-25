@@ -1,91 +1,306 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="container-xxl py-5">
+<style>
+    .receipt-shell {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-top: 5px solid #0f7694;
+        border-radius: 12px;
+        padding: 2rem 2.25rem;
+        box-shadow: 0 8px 28px rgba(10, 25, 47, 0.06);
+        color: #0f172a;
+    }
+    .receipt-stamp {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 2px solid #15803d;
+        color: #15803d;
+        background: #f0fdf4;
+        font-weight: 800;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+        text-transform: uppercase;
+    }
+    .receipt-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem 1.5rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+    }
+    .receipt-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        display: block;
+        margin-bottom: 2px;
+    }
+    .receipt-value {
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .receipt-value-lg {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .receipt-table th,
+    .receipt-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+    }
+    .receipt-table thead th {
+        background: #f1f5f9;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+    }
+    .receipt-table tfoot td {
+        border-top: 2px solid #0f7694;
+        border-bottom: none;
+        background: #f0fdf4;
+        font-weight: 800;
+        font-size: 1.08rem;
+    }
+    .receipt-sign-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px dashed #cbd5e1;
+    }
+    .receipt-sign-line {
+        border-bottom: 1px solid #94a3b8;
+        height: 28px;
+        margin-bottom: 6px;
+    }
+
+    @media (max-width: 575.98px) {
+        .receipt-shell {
+            padding: 1.25rem;
+        }
+        .receipt-meta-grid,
+        .receipt-sign-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 12mm;
+        }
+        html, body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        nav,
+        .navbar,
+        footer,
+        .footer,
+        #spinner,
+        .alert,
+        .back-to-top,
+        .back-to-top-footer,
+        .no-print,
+        .d-print-none,
+        body > .container.mt-3 {
+            display: none !important;
+        }
+        .receipt-page-wrapper,
+        .receipt-page-wrapper > .container,
+        .receipt-page-wrapper .row,
+        .receipt-page-wrapper .receipt-col {
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            flex: 0 0 100% !important;
+        }
+        .receipt-shell {
+            box-shadow: none !important;
+            border: 1.5px solid #94a3b8 !important;
+            border-top: 5px solid #0f7694 !important;
+            border-radius: 6px !important;
+            padding: 1.5rem 1.75rem !important;
+            margin: 0 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+        .receipt-meta-grid,
+        .receipt-sign-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+</style>
+
+<div class="container-xxl py-5 receipt-page-wrapper">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="bg-white rounded-4 shadow-sm border border-light p-4 p-lg-5" id="printable-receipt">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-4 mb-4 border-bottom">
+            <div class="col-lg-8 receipt-col">
+                <!-- Screen-only action bar above receipt -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 d-print-none">
+                    <a href="{% url 'wassce_registration' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-plus me-1"></i>New Payment
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary btn-sm px-3 fw-bold" onclick="window.print()">
+                            <i class="fa fa-print me-2"></i>Print / Save PDF Receipt
+                        </button>
+                        <a href="{% url 'index' %}" class="btn btn-light border btn-sm">
+                            Home
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Official Printable Receipt -->
+                <div class="receipt-shell" id="printable-receipt">
+                    <!-- School Letterhead -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-3 mb-4 border-bottom">
                         <div class="d-flex align-items-center">
-                            <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="60" height="60" class="me-3">
+                            <img src="{% static 'img/logo.png' %}" alt="NJUASCO" width="60" height="60" style="object-fit: contain;" class="me-3">
                             <div>
-                                <h4 class="mb-0 text-primary">New Juaben Senior High Commercial School</h4>
-                                <small class="text-muted">Koforidua, Eastern Region - Ghana • "DAASEBRE MMA"</small>
+                                <h5 class="mb-0 fw-bold" style="color: #0f7694;">New Juaben Senior High Commercial School</h5>
+                                <div class="small text-muted">P.O. Box KF 480, Koforidua, Eastern Region — Ghana</div>
+                                <div class="small fw-semibold" style="color: #0f7694;">Motto: "DAASEBRE MMA"</div>
                             </div>
                         </div>
                         <div class="text-sm-end">
-                            <span class="badge bg-success px-3 py-2 rounded-pill mb-1">
-                                <i class="fa fa-check-circle me-1"></i>PAYMENT VERIFIED
+                            <span class="receipt-stamp">
+                                <i class="fa fa-check-circle"></i>Paid &amp; Verified
                             </span>
-                            <div class="small text-muted">Ref: <strong>{{ payment.reference }}</strong></div>
+                            <div class="small text-muted mt-2">
+                                Receipt No: <strong class="text-dark">{{ payment.reference }}</strong>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Document Title -->
                     <div class="text-center mb-4">
-                        <h3 class="mb-1">Official WASSCE Registration Fee Receipt</h3>
-                        <p class="text-muted small mb-0">
-                            Paid on {{ payment.paid_at|default:payment.created_at|date:"F d, Y - h:i A" }}
-                        </p>
-                    </div>
-
-                    <div class="row g-3 p-4 bg-light rounded-3 mb-4 border">
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Candidate Surname</span>
-                            <span class="fw-bold text-dark fs-5">{{ payment.surname|upper }}</span>
+                        <div class="text-uppercase fw-bold small" style="letter-spacing: 0.1em; color: #0f7694;">
+                            Official Payment Receipt
                         </div>
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Candidate Other Names</span>
-                            <span class="fw-bold text-dark fs-5">{{ payment.other_names }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Academic Programme</span>
-                            <span class="fw-semi-bold text-dark">{{ payment.programme.name }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Class</span>
-                            <span class="fw-semi-bold text-dark">{{ payment.school_class.name }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Parent / Guardian Phone</span>
-                            <span class="fw-semi-bold text-dark">{{ payment.parent_phone }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <span class="text-muted small d-block">Parent / Guardian Name</span>
-                            <span class="fw-semi-bold text-dark">{{ payment.parent_name|default:"—" }}</span>
+                        <h4 class="fw-bold mb-1 text-dark">WASSCE Registration Fee ({{ payment.academic_year }})</h4>
+                        <div class="small text-muted">
+                            Payment Verified On: <strong class="text-dark">{{ payment.paid_at|default:payment.created_at|date:"F d, Y — h:i A" }}</strong>
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-3 border mb-4">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">WASSCE Registration Fee</span>
-                            <span class="fw-semi-bold">GHS {{ payment.base_fee }}</span>
+                    <!-- Candidate & Payer Details -->
+                    <div class="receipt-meta-grid mb-4">
+                        <div>
+                            <span class="receipt-label">Candidate Surname</span>
+                            <span class="receipt-value-lg">{{ payment.surname|upper }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                            <span class="text-muted">Transaction Charge</span>
-                            <span class="fw-semi-bold">GHS {{ payment.transaction_charge }}</span>
+                        <div>
+                            <span class="receipt-label">Candidate Other Names</span>
+                            <span class="receipt-value-lg">{{ payment.other_names }}</span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-dark fs-5">Total Amount Paid</span>
-                            <span class="fw-extra-bold text-success fs-4">GHS {{ payment.total_amount }}</span>
+                        <div>
+                            <span class="receipt-label">Academic Programme</span>
+                            <span class="receipt-value">{{ payment.programme.name }}</span>
+                        </div>
+                        <div>
+                            <span class="receipt-label">Class</span>
+                            <span class="receipt-value">{{ payment.school_class.name }}</span>
+                        </div>
+                        <div>
+                            <span class="receipt-label">Parent / Guardian Name</span>
+                            <span class="receipt-value">{{ payment.parent_name|default:"—" }}</span>
+                        </div>
+                        <div>
+                            <span class="receipt-label">Parent / Guardian Phone</span>
+                            <span class="receipt-value">{{ payment.parent_phone }}</span>
                         </div>
                     </div>
 
-                    <div class="d-flex flex-wrap gap-3 justify-content-center d-print-none">
-                        <button type="button" class="btn btn-primary px-4 py-2" onclick="window.print()">
-                            <i class="fa fa-print me-2"></i>Print Receipt
-                        </button>
-                        <a href="{% url 'wassce_registration' %}" class="btn btn-outline-primary px-4 py-2">
-                            Make Another Payment
-                        </a>
-                        <a href="{% url 'index' %}" class="btn btn-light px-4 py-2">
-                            Return Home
-                        </a>
+                    <!-- Payment Breakdown Table -->
+                    <div class="border rounded-3 overflow-hidden mb-3">
+                        <table class="receipt-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Description</th>
+                                    <th style="text-align: right; width: 170px;">Amount (GHS)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>WASSCE Registration Fee ({{ payment.academic_year }})</td>
+                                    <td style="text-align: right; font-weight: 600;">GHS {{ payment.base_fee }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Electronic Payment &amp; Processing Charge (Sender Borne)</td>
+                                    <td style="text-align: right; font-weight: 600;">GHS {{ payment.transaction_charge }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td style="color: #0f172a;">Total Amount Paid</td>
+                                    <td style="text-align: right; color: #15803d;">GHS {{ payment.total_amount }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
+
+                    <!-- Payment Method & Verification Notice -->
+                    <div class="d-flex justify-content-between flex-wrap gap-2 small text-muted px-1">
+                        <span>Payment Gateway: <strong class="text-dark">Paystack (Verified Online)</strong></span>
+                        <span>Status: <strong style="color: #15803d;">VERIFIED</strong></span>
+                    </div>
+
+                    <!-- Official Signature / Stamp Footer -->
+                    <div class="receipt-sign-grid">
+                        <div>
+                            <div class="receipt-sign-line"></div>
+                            <div class="small text-muted">Accounts Office / School Stamp</div>
+                        </div>
+                        <div>
+                            <div class="receipt-sign-line"></div>
+                            <div class="small text-muted">Date Received / Checked By</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4 pt-2 border-top" style="font-size: 0.74rem; color: #64748b;">
+                        This is an electronically verified receipt issued via the official NJUASCO portal (njuascogh.org).
+                        Reference: <strong>{{ payment.reference }}</strong>
+                    </div>
+                </div>
+
+                <!-- Screen-only bottom actions -->
+                <div class="d-flex flex-wrap gap-3 justify-content-center mt-4 d-print-none">
+                    <button type="button" class="btn btn-primary px-4 py-2" onclick="window.print()">
+                        <i class="fa fa-print me-2"></i>Print / Save PDF Receipt
+                    </button>
+                    <a href="{% url 'wassce_registration' %}" class="btn btn-outline-primary px-4 py-2">
+                        Make Another Payment
+                    </a>
+                    <a href="{% url 'index' %}" class="btn btn-light border px-4 py-2">
+                        Return Home
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock content %}
-
