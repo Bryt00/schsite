@@ -54,13 +54,13 @@ class WassceFeeConfigAdmin(ModelAdmin):
     )
     list_filter = ('is_active', 'academic_year')
     search_fields = ('title', 'academic_year', 'subaccount_code')
-    readonly_fields = ('class_payment_breakdown', 'updated_at')
+    readonly_fields = ('paystack_subaccount_status', 'class_payment_breakdown', 'updated_at')
     fieldsets = (
         ("Academic Year & Fee Setup", {
             "fields": ("academic_year", "title", "fee_amount", "is_active", "instructions"),
         }),
         ("Paystack Subaccount & Sender-Borne Charges", {
-            "fields": ("subaccount_code", "charge_percentage", "flat_charge"),
+            "fields": ("subaccount_code", "paystack_subaccount_status", "charge_percentage", "flat_charge"),
         }),
         ("Per-Class Payment Counts (This Academic Year)", {
             "fields": ("class_payment_breakdown", "updated_at"),
@@ -83,6 +83,55 @@ class WassceFeeConfigAdmin(ModelAdmin):
     def net_amount_collected(self, obj):
         total = getattr(obj, '_net_sum', None) or Decimal("0.00")
         return f"GHS {total:,.2f}"
+
+    @admin.display(description="Paystack Subaccount Check")
+    def paystack_subaccount_status(self, obj):
+        from .paystack import Paystack
+        paystack = Paystack()
+        admin_code = (obj.subaccount_code or "").strip() if obj else ""
+        effective = obj.effective_subaccount_code if obj else ""
+        source = "Admin field above" if admin_code else ".env (PAYSTACK_WASSCE_SUBACCOUNT)"
+        if not effective:
+            return format_html(
+                '<span style="color:#b91c1c; font-weight:600;">No subaccount configured.</span> '
+                'Server key: <code>{}...</code> ({})',
+                paystack.key_prefix,
+                paystack.key_mode,
+            )
+
+        ok, result = paystack.fetch_subaccount(effective, timeout=5)
+        if ok and isinstance(result, dict):
+            return format_html(
+                '<span style="color:#15803d; font-weight:700;">&#10003; Valid &amp; Active</span> '
+                '— <code>{}</code> ({}, {}, {} domain) | Source: {} | Server key: <code>{}...</code> ({})',
+                effective,
+                result.get('business_name') or 'Subaccount',
+                result.get('settlement_bank') or '',
+                result.get('domain') or paystack.key_mode.lower(),
+                source,
+                paystack.key_prefix,
+                paystack.key_mode,
+            )
+
+        avail_ok, avail = paystack.list_subaccounts(timeout=5)
+        available_hint = ""
+        if avail_ok and isinstance(avail, list):
+            codes = [s.get('subaccount_code', '') for s in avail if s.get('subaccount_code')]
+            available_hint = (
+                f" Available subaccounts on this {paystack.key_mode} key: {', '.join(codes)}"
+                if codes
+                else f" No subaccounts exist on this {paystack.key_mode} key."
+            )
+        return format_html(
+            '<span style="color:#b91c1c; font-weight:700;">&#10007; Invalid under current server key</span> '
+            '— Sent <code>{}</code> (from {}) with key <code>{}...</code> ({}). Paystack said: {}.{}',
+            effective,
+            source,
+            paystack.key_prefix,
+            paystack.key_mode,
+            str(result),
+            available_hint,
+        )
 
     @admin.display(description="Payments Made by Class")
     def class_payment_breakdown(self, obj):

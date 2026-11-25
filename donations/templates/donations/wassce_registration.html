@@ -65,7 +65,7 @@
                     </div>
                     {% endif %}
 
-                    <form method="post" novalidate>
+                    <form id="wassceRegistrationForm" method="post" autocomplete="off" novalidate>
                         {% csrf_token %}
                         <div class="row g-4">
                             <div class="col-12">
@@ -224,47 +224,80 @@
     </div>
 </div>
 
-{% if school_classes %}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const programmeSelect = document.getElementById("id_programme");
-        const classSelect = document.getElementById("id_school_class");
-        if (!programmeSelect || !classSelect) return;
+    (function () {
+        let filterClassesFn = null;
 
-        const classProgrammeMap = {
-            {% for sc in school_classes %}
-            "{{ sc.id }}": "{{ sc.programme_id|default:'' }}",
-            {% endfor %}
-        };
-
-        const allOptions = Array.from(classSelect.options).map(opt => ({
-            value: opt.value,
-            text: opt.text,
-            programmeId: classProgrammeMap[opt.value] || ""
-        }));
-
-        function filterClasses() {
-            const selectedProgramme = programmeSelect.value;
-            const currentClass = classSelect.value;
-            classSelect.innerHTML = "";
-
-            allOptions.forEach(opt => {
-                if (!opt.value || !selectedProgramme || !opt.programmeId || opt.programmeId === selectedProgramme) {
-                    const optionEl = document.createElement("option");
-                    optionEl.value = opt.value;
-                    optionEl.textContent = opt.text;
-                    if (opt.value === currentClass) {
-                        optionEl.selected = true;
-                    }
-                    classSelect.appendChild(optionEl);
-                }
+        function clearStaleFormValues() {
+            {% if not form.errors %}
+            const form = document.getElementById("wassceRegistrationForm");
+            if (!form) return;
+            form.reset();
+            form.querySelectorAll("input:not([type='hidden']):not([type='submit']):not([type='button']), textarea").forEach(el => {
+                el.value = "";
             });
+            form.querySelectorAll("select").forEach(el => {
+                el.selectedIndex = 0;
+                el.value = "";
+            });
+            if (typeof filterClassesFn === "function") {
+                filterClassesFn();
+            }
+            {% endif %}
         }
 
-        programmeSelect.addEventListener("change", filterClasses);
-        filterClasses();
-    });
+        document.addEventListener("DOMContentLoaded", function () {
+            const programmeSelect = document.getElementById("id_programme");
+            const classSelect = document.getElementById("id_school_class");
+
+            if (programmeSelect && classSelect) {
+                const classProgrammeMap = {
+                    {% for sc in school_classes %}
+                    "{{ sc.id }}": "{{ sc.programme_id|default:'' }}",
+                    {% endfor %}
+                };
+
+                const allOptions = Array.from(classSelect.options).map(opt => ({
+                    value: opt.value,
+                    text: opt.text,
+                    programmeId: classProgrammeMap[opt.value] || ""
+                }));
+
+                filterClassesFn = function filterClasses() {
+                    const selectedProgramme = programmeSelect.value;
+                    const currentClass = classSelect.value;
+                    classSelect.innerHTML = "";
+
+                    allOptions.forEach(opt => {
+                        if (!opt.value || !selectedProgramme || !opt.programmeId || opt.programmeId === selectedProgramme) {
+                            const optionEl = document.createElement("option");
+                            optionEl.value = opt.value;
+                            optionEl.textContent = opt.text;
+                            if (opt.value === currentClass) {
+                                optionEl.selected = true;
+                            }
+                            classSelect.appendChild(optionEl);
+                        }
+                    });
+                };
+
+                programmeSelect.addEventListener("change", filterClassesFn);
+                filterClassesFn();
+            }
+
+            // Clear any browser-restored values from a prior incomplete payment
+            clearStaleFormValues();
+        });
+
+        // Also clear when returning via browser Back/Forward cache (bfcache)
+        window.addEventListener("pageshow", function (event) {
+            const navEntries = performance.getEntriesByType ? performance.getEntriesByType("navigation") : [];
+            const isBackForward = navEntries.length > 0 && navEntries[0].type === "back_forward";
+            if (event.persisted || isBackForward) {
+                clearStaleFormValues();
+            }
+        });
+    })();
 </script>
-{% endif %}
 {% endblock content %}
 

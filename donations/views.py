@@ -1,3 +1,4 @@
+import sys
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -5,7 +6,15 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
-from .models import DonationCause, Donation, SchoolClass, WassceFeeConfig, WasscePayment
+from django.views.decorators.cache import never_cache
+from .models import (
+    DonationCause,
+    Donation,
+    SchoolClass,
+    WassceFeeConfig,
+    WasscePayment,
+    generate_wassce_reference,
+)
 from .forms import DonationForm, WasscePaymentForm
 from .paystack import Paystack
 
@@ -57,6 +66,7 @@ def verify_donation(request, reference):
     return render(request, 'donations/donation_success.html', {'donation': donation})
 
 
+@never_cache
 def wassce_registration(request):
     fee_config = WassceFeeConfig.objects.filter(is_active=True).first()
     # Never collect WASSCE fees into the main account: keep the portal closed until a subaccount is configured.
@@ -90,6 +100,7 @@ def wassce_registration(request):
     })
 
 
+@never_cache
 def wassce_checkout(request, reference):
     payment = get_object_or_404(
         WasscePayment.objects.select_related('programme', 'school_class', 'fee_config'),
@@ -104,10 +115,11 @@ def wassce_checkout(request, reference):
     })
 
 
+@never_cache
 def wassce_initialize_payment(request, reference):
     """
     Initializes transaction directly with Paystack API using the server's Secret Key
-    and returns the authorized access_code for PaystackPop.
+    and returns the authorized authorization_url/access_code for checkout.
     """
     try:
         payment = get_object_or_404(
@@ -115,7 +127,29 @@ def wassce_initialize_payment(request, reference):
             reference=reference,
         )
         if payment.status == 'verified':
-            return JsonResponse({'status': False, 'message': 'Payment already verified.'})
+            return JsonResponse({
+                'status': True,
+                'already_verified': True,
+                'redirect_url': reverse('wassce_receipt', args=[payment.reference]),
+                'reference': payment.reference,
+            })
+
+        # Always sync to the latest configured subaccount code so retries never stay stuck on a stale value.
+        active_config = WassceFeeConfig.objects.filter(is_active=True).first()
+        effective_subaccount = (
+            (active_config.effective_subaccount_code if active_config else "")
+            or (payment.fee_config.effective_subaccount_code if payment.fee_config else "")
+            or (getattr(settings, 'PAYSTACK_WASSCE_SUBACCOUNT', '') or '').strip()
+            or (payment.subaccount_code or '').strip()
+        )
+        if not effective_subaccount:
+            return JsonResponse(
+                {'status': False, 'message': 'WASSCE payment subaccount is not configured yet. Please contact administration.'},
+                status=400,
+            )
+        if payment.subaccount_code != effective_subaccount:
+            payment.subaccount_code = effective_subaccount
+            payment.save(update_fields=['subaccount_code'])
 
         paystack = Paystack()
         total_pesewas = int(payment.total_amount * 100)
@@ -129,19 +163,46 @@ def wassce_initialize_payment(request, reference):
             ]
         }
 
-        callback_url = request.build_absolute_uri(
-            reverse('verify_wassce_payment', args=[payment.reference])
-        )
+        def _init_with_current_ref():
+            cb_url = request.build_absolute_uri(
+                reverse('verify_wassce_payment', args=[payment.reference])
+            )
+            return paystack.initialize_transaction(
+                email=payment.payer_email_for_paystack,
+                amount_pesewas=total_pesewas,
+                reference=payment.reference,
+                callback_url=cb_url,
+                subaccount=effective_subaccount,
+                bearer="subaccount",
+                metadata=metadata,
+            )
 
-        status, data = paystack.initialize_transaction(
-            email=payment.payer_email_for_paystack,
-            amount_pesewas=total_pesewas,
-            reference=payment.reference,
-            callback_url=callback_url,
-            subaccount=payment.subaccount_code or None,
-            bearer="subaccount" if payment.subaccount_code else None,
-            metadata=metadata,
-        )
+        status, data = _init_with_current_ref()
+
+        # If the user previously opened Paystack without completing payment, Paystack rejects reusing the reference.
+        if not status and isinstance(data, str) and 'duplicate' in data.lower():
+            v_status, v_result = paystack.verify_payment(payment.reference)
+            if v_status and isinstance(v_result, dict) and v_result.get('status') == 'success':
+                paid_pesewas = int(v_result.get('amount', 0))
+                paid_currency = v_result.get('currency', 'GHS')
+                split_info = v_result.get('subaccount') or {}
+                paid_subaccount = split_info.get('subaccount_code', '') if isinstance(split_info, dict) else ''
+                if paid_currency == 'GHS' and paid_pesewas >= total_pesewas and paid_subaccount == effective_subaccount:
+                    payment.status = 'verified'
+                    payment.paid_at = timezone.now()
+                    payment.save(update_fields=['status', 'paid_at'])
+                    return JsonResponse({
+                        'status': True,
+                        'already_verified': True,
+                        'redirect_url': reverse('wassce_receipt', args=[payment.reference]),
+                        'reference': payment.reference,
+                    })
+
+            # Safe to rotate reference and retry initialization cleanly.
+            payment.reference = generate_wassce_reference()
+            payment.status = 'pending'
+            payment.save(update_fields=['reference', 'status'])
+            status, data = _init_with_current_ref()
 
         if status and isinstance(data, dict):
             return JsonResponse({
@@ -149,9 +210,21 @@ def wassce_initialize_payment(request, reference):
                 'access_code': data.get('access_code'),
                 'authorization_url': data.get('authorization_url'),
                 'reference': payment.reference,
+                'checkout_url': reverse('wassce_checkout', args=[payment.reference]),
             })
         else:
             err_msg = data if isinstance(data, str) else "Could not initialize transaction with Paystack."
+            print(
+                f"[WASSCE Paystack Init Error] mode={paystack.key_mode} key={paystack.key_prefix}... "
+                f"subaccount={effective_subaccount!r} ref={payment.reference} error={err_msg!r}",
+                file=sys.stderr,
+            )
+            if isinstance(err_msg, str) and 'subaccount' in err_msg.lower():
+                err_msg = (
+                    f"{err_msg} (Subaccount '{effective_subaccount}' was rejected under the server's "
+                    f"{paystack.key_mode} Paystack key '{paystack.key_prefix}...'). "
+                    f"Verify PAYSTACK_SECRET_KEY in the server .env and Subaccount Code in WASSCE Fee Settings."
+                )
             return JsonResponse({'status': False, 'message': err_msg}, status=400)
     except Exception as e:
         import traceback

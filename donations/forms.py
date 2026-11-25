@@ -31,35 +31,42 @@ class WasscePaymentForm(forms.ModelForm):
             'surname': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': "Ward's Surname (e.g. Mensah)",
+                'autocomplete': 'off',
                 'required': True,
             }),
             'other_names': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': "Ward's Other Names (e.g. Kwame Kofi)",
+                'autocomplete': 'off',
                 'required': True,
             }),
             'programme': forms.Select(attrs={
                 'class': 'form-select',
                 'id': 'id_programme',
+                'autocomplete': 'off',
                 'required': True,
             }),
             'school_class': forms.Select(attrs={
                 'class': 'form-select',
                 'id': 'id_school_class',
+                'autocomplete': 'off',
                 'required': True,
             }),
             'parent_name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Parent / Guardian Full Name',
+                'autocomplete': 'off',
             }),
             'parent_phone': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Parent / Guardian Phone Number (e.g. 024XXXXXXX)',
+                'autocomplete': 'off',
                 'required': True,
             }),
             'parent_email': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Parent / Guardian Email (Optional for Receipt)',
+                'autocomplete': 'off',
             }),
         }
 
